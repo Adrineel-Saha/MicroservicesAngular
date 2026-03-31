@@ -1,0 +1,49 @@
+<h3>Add a New Order Item</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="orderItemForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="productId">Product_Id:</label>
+            <input type="number" class="form-control" id="productId" name="productId" formControlName="productId">
+            <div *ngIf= "productIdControl.touched && productIdControl.errors?.['required']">
+                <p style="color: red;">Product_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "productIdControl.touched && productIdControl.errors?.['min']">
+                <p style="color: red;">Product_Id must be a positive number</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="quantity">Quantity:</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" formControlName="quantity">
+            <div *ngIf= "quantityControl.touched && quantityControl.errors?.['required']">
+                <p style="color: red;">Quantity cannot be blank</p>
+            </div>
+            <div *ngIf= "quantityControl.touched && quantityControl.errors?.['min']">
+                <p style="color: red;">Quantity must be at least 1</p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="orderId">Order_Id:</label>
+            <input type="number" class="form-control" id="orderId" name="orderId" formControlName="orderId">
+            <div *ngIf= "orderIdControl.touched && orderIdControl.errors?.['required']">
+                <p style="color: red;">Order_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "orderIdControl.touched && orderIdControl.errors?.['min']">
+                <p style="color: red;">Order_Id must be a positive number</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!orderItemForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>Form Submitted Successfully!</h4>
+</div>

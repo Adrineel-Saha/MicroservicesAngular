@@ -1,0 +1,36 @@
+<h3>Add a New Order</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="userId">User_Id:</label>
+            <input type="number" class="form-control" id="userId" name="userId" formControlName="userId">
+            <div *ngIf= "userIdControl.touched && userIdControl.errors?.['required']">
+                <p style="color: red;">User_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "userIdControl.touched && userIdControl.errors?.['min']">
+                <p style="color: red;">User_Id must be a positive number</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <input type="text" class="form-control" id="status" name="status" formControlName="status">
+            <div *ngIf= "statusControl.touched && statusControl.errors?.['required']">
+                <p style="color: red;">Status cannot be blank</p>
+            </div>
+            <div *ngIf= "statusControl.touched && statusControl.errors?.['pattern']">
+                <p style="color: red;">Status must be one of: CREATED, PAID, SHIPPED, CANCELLED</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!orderForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>Form Submitted Successfully!</h4>
+</div>

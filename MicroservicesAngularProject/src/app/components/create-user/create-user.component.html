@@ -1,0 +1,39 @@
+<h3>Add a New User</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="userName">User_Name:</label>
+            <input type="text" class="form-control" id="userName" name="userName" formControlName="userName">
+            <div *ngIf= "userNameControl.touched && userNameControl.errors?.['required']">
+                <p style="color: red;">User_Name cannot be blank</p>
+            </div>
+            <div *ngIf= "userNameControl.touched && userNameControl.errors?.['minlength']">
+                <p style="color: red;">User_Name must be atleast 3 characters long</p>
+            </div>
+            <div *ngIf= "userNameControl.touched && userNameControl.errors?.['maxlength']">
+                <p style="color: red;">User_Name must be maximum 50 characters long</p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" class="form-control" id="email" name="email" formControlName="email">
+            <div *ngIf= "emailControl.touched && emailControl.errors?.['required']">
+                <p style="color: red;">Email cannot be blank</p>
+            </div>
+            <div *ngIf= "emailControl.touched && emailControl.errors?.['pattern']">
+                <p style="color: red;">Please enter a valid email</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!userForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>Form Submitted Successfully!</h4>
+</div>

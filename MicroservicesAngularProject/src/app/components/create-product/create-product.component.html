@@ -1,0 +1,56 @@
+<h3>Add a New Product</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="name">Product_Name:</label>
+            <input type="text" class="form-control" id="name" name="name" formControlName="name">
+            <div *ngIf= "productNameControl.touched && productNameControl.errors?.['required']">
+                <p style="color: red;">Product_Name cannot be blank</p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" class="form-control" id="description" name="description" formControlName="description">
+            <div *ngIf= "descriptionControl.touched && descriptionControl.errors?.['required']">
+                <p style="color: red;">Description cannot be blank</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" class="form-control" id="price" name="price" formControlName="price">
+            <div *ngIf= "priceControl.touched && priceControl.errors?.['required']">
+                <p style="color: red;">Price cannot be blank</p>
+            </div>
+            <div *ngIf= "priceControl.touched && priceControl.errors?.['min']">
+                <p style="color: red;">Price should be positive</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="stock">Stock:</label>
+            <input type="number" class="form-control" id="stock" name="stock" formControlName="stock">
+            <div *ngIf= "stockControl.touched && stockControl.errors?.['required']">
+                <p style="color: red;">Stock cannot be blank</p>
+            </div>
+            <div *ngIf= "stockControl.touched && stockControl.errors?.['min']">
+                <p style="color: red;">Stock cannot less then 0</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!productForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>Form Submitted Successfully!</h4>
+</div>
