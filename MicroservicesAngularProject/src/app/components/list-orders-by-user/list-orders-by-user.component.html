@@ -1,0 +1,45 @@
+<h3>List Orders By Users</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="userIdForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="userId">Enter User_Id:</label>
+            <input type="number" class="form-control" id="userId" name="userId" formControlName="userId">
+            <div *ngIf= "userIdControl.touched && userIdControl.errors?.['required']">
+                <p style="color: red;">User_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "userIdControl.touched && userIdControl.errors?.['min']">
+                <p style="color: red;">User_Id should be positive</p>
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!userIdForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h3>List of Orders</h3>
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+        <th scope="col">Order_Id</th>
+        <th scope="col">User_Id</th>
+        <th scope="col">Status</th>
+        <th scope="col">Created_At</th>
+        <th scope="col">User_Name</th>
+        <th scope="col">Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let order of orders">
+        <td>{{order.id}}</td>
+        <td>{{order.userId}}</td>
+        <td>{{order.status}}</td>
+        <td>{{order.createdAt}}</td>
+        <td>{{order.userName}}</td>
+        <td>{{order.email}}</td>
+    </tr>
+    </tbody>
+    </table>
+</div>

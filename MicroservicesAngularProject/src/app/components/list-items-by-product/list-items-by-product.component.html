@@ -1,0 +1,49 @@
+<h3>List Orders By Users</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="productIdForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="productId">Enter Product_Id:</label>
+            <input type="number" class="form-control" id="productId" name="productId" formControlName="productId">
+            <div *ngIf= "productIdControl.touched && productIdControl.errors?.['required']">
+                <p style="color: red;">Product_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "productIdControl.touched && productIdControl.errors?.['min']">
+                <p style="color: red;">Product_Id should be positive</p>
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!productIdForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h3>List of OrderItems</h3>
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+        <th scope="col">Order_Item_Id</th>
+        <th scope="col">Product_Id</th>
+        <th scope="col">Quantiy</th>
+        <th scope="col">Price</th>
+        <th scope="col">Order_Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Stock</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let orderItem of orderItems">
+        <td>{{orderItem.id}}</td>
+        <td>{{orderItem.productId}}</td>
+        <td>{{orderItem.quantity}}</td>
+        <td>{{orderItem.price}}</td>
+        <td>{{orderItem.orderId}}</td>
+        <td>{{orderItem.name}}</td>
+        <td>{{orderItem.description}}</td>
+        <td>{{orderItem.stock}}</td>
+    </tr>
+    </tbody>
+    </table>
+</div>

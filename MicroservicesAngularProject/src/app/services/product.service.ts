@@ -19,11 +19,15 @@ export class ProductService {
     return this.http.get<Product[]>(this.backendProductURI);
   }
 
-  public getUser(productId:number){
-    return this.http.get<Product>(this.backendProductURI+"/"+productId);
+  public getProduct(productId:number){
+    return this.http.get<Product>(this.backendProductURI+"/id/"+productId);
   }
 
-  public updateUser(productId:number,product:Product){
+  public getProductsByName(name:string){
+    return this.http.get<Product[]>(this.backendProductURI+"/name/"+name);
+  }
+
+  public updateProduct(productId:number,product:Product){
     return this.http.put<Product>(this.backendProductURI+"/"+productId,product);
   }
 

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Product } from 'src/app/models/product';
+import { ProductService } from 'src/app/services/product.service';
 
 @Component({
   selector: 'app-create-product',
@@ -8,6 +10,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 })
 export class CreateProductComponent implements OnInit{
   submitted=false;
+  product:Product=new Product();
 
   productForm!: FormGroup;
   
@@ -16,10 +19,11 @@ export class CreateProductComponent implements OnInit{
   priceControl!: FormControl;
   stockControl!: FormControl;
 
-  constructor(){}
+  constructor(private productService:ProductService){}
 
   ngOnInit(){
     this.submitted=false;
+    this.product=new Product();
 
     this.productNameControl=new FormControl('',[Validators.required]);
     this.descriptionControl=new FormControl('',[Validators.required]);
@@ -35,9 +39,15 @@ export class CreateProductComponent implements OnInit{
   }
 
   onSubmit(){
-      // console.log("Submitted"+this.submitted);
-      this.submitted=true;
-      // console.log("Submitted"+this.submitted);
-      // alert("Form Submitted");
+    this.product=this.productForm.value;
+
+    this.productService.createProduct(this.product).subscribe(
+      data=>{
+        console.log(data);
+        this.submitted=true;
+        this.productForm.reset();
+    },error=>{
+      console.log(error);
+    })       
   }
 }

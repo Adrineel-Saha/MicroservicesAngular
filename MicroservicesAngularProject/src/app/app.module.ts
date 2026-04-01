@@ -10,6 +10,10 @@ import { CreateUserComponent } from './components/create-user/create-user.compon
 import { CreateOrderComponent } from './components/create-order/create-order.component';
 import { CreateOrderItemComponent } from './components/create-order-item/create-order-item.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ListUsersComponent } from './components/list-users/list-users.component';
+import { ListProductsByNameComponent } from './components/list-products-by-name/list-products-by-name.component';
+import { ListOrdersByUserComponent } from './components/list-orders-by-user/list-orders-by-user.component';
+import { ListItemsByProductComponent } from './components/list-items-by-product/list-items-by-product.component';
 
 
 @NgModule({
@@ -19,7 +23,11 @@ import { ReactiveFormsModule } from '@angular/forms';
     CreateProductComponent,
     CreateUserComponent,
     CreateOrderComponent,
-    CreateOrderItemComponent
+    CreateOrderItemComponent,
+    ListUsersComponent,
+    ListProductsByNameComponent,
+    ListOrdersByUserComponent,
+    ListItemsByProductComponent
   ],
   imports: [
     BrowserModule,

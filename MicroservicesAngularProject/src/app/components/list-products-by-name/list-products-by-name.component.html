@@ -1,0 +1,40 @@
+<h3>List Products by Name</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="productNameForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="productName">Enter Product_Name:</label>
+            <input type="text" class="form-control" id="productName" name="productName" formControlName="productName">
+            <div *ngIf= "productNameControl.touched && productNameControl.errors?.['required']">
+                <p style="color: red;">Product_Name cannot be blank</p>
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!productNameForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h3>List of Products</h3>
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+        <th scope="col">Product_Id</th>
+        <th scope="col">Product_Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Price</th>
+        <th scope="col">Stock</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let product of products">
+        <td>{{product.id}}</td>
+        <td>{{product.name}}</td>
+        <td>{{product.description}}</td>
+        <td>{{product.price}}</td>
+        <td>{{product.stock}}</td>
+    </tr>
+    </tbody>
+    </table>
+</div>

@@ -26,7 +26,7 @@ export class OrderService {
   }
 
   public listOrdersByUser(userId:number){
-    return this.http.get<Order[]>(this.backendOrderURI+"/"+userId);
+    return this.http.get<Order[]>(this.backendOrderURI+"/user/"+userId);
   }
 
   public updateOrderStatus(orderId:number,status:string){
@@ -50,11 +50,11 @@ export class OrderService {
   }
 
   public listItemsByProduct(productId:number){
-    return this.http.get<OrderItem[]>(this.backendOrderItemURI+"/"+productId);
+    return this.http.get<OrderItem[]>(this.backendOrderItemURI+"/product/"+productId);
   }
 
   public listItemsByOrder(orderId:number){
-    return this.http.get<OrderItem[]>(this.backendOrderItemURI+"/"+orderId);
+    return this.http.get<OrderItem[]>(this.backendOrderItemURI+"/order/"+orderId);
   }
 
   public updateItem(itemId:number,orderItem:OrderItem){

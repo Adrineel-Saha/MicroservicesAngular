@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { OrderItem } from 'src/app/models/order-item';
+import { OrderService } from 'src/app/services/order.service';
 
 @Component({
   selector: 'app-create-order-item',
@@ -7,7 +9,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./create-order-item.component.css']
 })
 export class CreateOrderItemComponent implements OnInit {
- submitted=false;
+  submitted=false;
+  orderItem:OrderItem=new OrderItem();
 
   orderItemForm!: FormGroup;
   
@@ -15,10 +18,11 @@ export class CreateOrderItemComponent implements OnInit {
   quantityControl!: FormControl;
   orderIdControl!: FormControl;
 
-  constructor(){}
+  constructor(private orderItemService:OrderService){}
 
   ngOnInit(){
     this.submitted=false;
+    this.orderItem=new OrderItem();
 
     this.productIdControl=new FormControl('',[Validators.required, Validators.min(1)]);
     this.quantityControl=new FormControl('',[Validators.required, Validators.min(1)]);
@@ -32,9 +36,15 @@ export class CreateOrderItemComponent implements OnInit {
   }
 
   onSubmit(){
-      // console.log("Submitted"+this.submitted);
-      this.submitted=true;
-      // console.log("Submitted"+this.submitted);
-      // alert("Form Submitted");
+    this.orderItem=this.orderItemForm.value;
+
+    this.orderItemService.addItem(this.orderItem).subscribe(
+      data=>{
+        console.log(data);
+        this.submitted=true;
+        this.orderItemForm.reset();
+    },error=>{
+      console.log(error);
+    })    
   }
 }
