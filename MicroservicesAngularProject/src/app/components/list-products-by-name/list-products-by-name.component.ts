@@ -13,6 +13,7 @@ export class ListProductsByNameComponent implements OnInit{
   productName!:string;
   
   submitted=false;
+  isProductNameAbsent=false;
 
   productNameForm!: FormGroup;
   productNameControl!: FormControl;
@@ -21,25 +22,35 @@ export class ListProductsByNameComponent implements OnInit{
 
   ngOnInit() {
     this.submitted=false;
+    this.isProductNameAbsent=false;
 
     this.productNameControl=new FormControl('',[Validators.required]);
 
     this.productNameForm=new FormGroup({
-      productName: this.productNameControl,
+      productName: this.productNameControl
     });
   };
 
   onSubmit(){
-    console.log("ProductName "+this.productNameForm.value);
+    // console.log("ProductName "+this.productNameForm.value);
     this.productName=this.productNameForm.get('productName')?.value;
-    console.log("ProductName "+this.productName);
+    // console.log("ProductName "+this.productName);
 
     this.productService.getProductsByName(this.productName)
     .subscribe( data => {
       this.products = data;
       this.submitted=true;
+      this.productNameForm.reset();
     }, error=>{
-      console.log(error);
+      if(error.status === 404){
+        this.isProductNameAbsent=true;
+        setTimeout(()=>{
+          this.productNameForm.reset();
+          this.isProductNameAbsent=false;
+        },2000)
+      }else{
+        console.log(error);
+      }  
     });
   }
 }

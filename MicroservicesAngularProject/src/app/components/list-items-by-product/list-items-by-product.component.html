@@ -10,6 +10,9 @@
             <div *ngIf= "productIdControl.touched && productIdControl.errors?.['min']">
                 <p style="color: red;">Product_Id should be positive</p>
             </div>
+            <div *ngIf= "productIdControl.touched && isProductIdAbsent"> 
+                <p style="color: red;">No Product present with this Product_Id</p> 
+            </div>
         </div>
 
         <br>

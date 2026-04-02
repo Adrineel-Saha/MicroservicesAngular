@@ -1,0 +1,37 @@
+h3{
+    color:green;
+    text-align:center;
+}
+
+.form-group { 
+    width: 100%; 
+    max-width: 400px; 
+    margin-bottom: 1rem; 
+}
+
+.form-control { 
+    width: 100%; 
+    padding: 10px; 
+    margin: 5px 0; 
+    border: 2px solid #ccc; 
+    border-radius: 4px; 
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); 
+    background-color: #f9f9f9; 
+    font-weight: bold; 
+} 
+
+/* Style for readonly fields */ 
+input[readonly], textarea[readonly], select[readonly] { 
+    background-color: #f0f0f0; /* Light grey background */ 
+    color: #a0a0a0; /* Grey text */ 
+    filter: blur(1px); /* Apply blur effect */ 
+    pointer-events: none; /* Prevent interaction */ 
+} 
+/* Style for disabled fields */ 
+input:disabled, textarea:disabled, select:disabled { 
+    background-color: #f0f0f0; /* Light grey background */ 
+    color: #a0a0a0; /* Grey text */ 
+    filter: blur(1px); /* Apply blur effect */ 
+    pointer-events: none; /* Prevent interaction */ 
+    cursor: not-allowed; /* Change cursor to not-allowed */ 
+}

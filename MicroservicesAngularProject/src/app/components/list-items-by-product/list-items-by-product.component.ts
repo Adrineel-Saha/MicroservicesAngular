@@ -13,6 +13,7 @@ export class ListItemsByProductComponent implements OnInit{
   productId!: number;
   
   submitted=false;
+  isProductIdAbsent=false;
 
   productIdForm!: FormGroup;
   productIdControl!: FormControl;
@@ -21,6 +22,7 @@ export class ListItemsByProductComponent implements OnInit{
 
   ngOnInit() {
     this.submitted=false;
+    this.isProductIdAbsent=false;
 
     this.productIdControl=new FormControl('',[Validators.required, Validators.min(1)]);
 
@@ -36,8 +38,17 @@ export class ListItemsByProductComponent implements OnInit{
     .subscribe( data => {
       this.orderItems = data;
       this.submitted=true;
+      this.productIdForm.reset();
     }, error=>{
-      console.log(error);
+      if(error.status === 404){
+        this.isProductIdAbsent=true;
+        setTimeout(()=>{
+          this.productIdForm.reset();
+          this.isProductIdAbsent=false;
+        },2000)
+      }else{
+        console.log(error);
+      }      
     });
   }
 }

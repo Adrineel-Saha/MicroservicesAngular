@@ -13,6 +13,7 @@ export class ListOrdersByUserComponent implements OnInit{
   userId!: number;
   
   submitted=false;
+  isUserIdAbsent=false;
 
   userIdForm!: FormGroup;
   userIdControl!: FormControl;
@@ -21,6 +22,7 @@ export class ListOrdersByUserComponent implements OnInit{
 
   ngOnInit() {
     this.submitted=false;
+    this.isUserIdAbsent=false;
 
     this.userIdControl=new FormControl('',[Validators.required, Validators.min(1)]);
 
@@ -38,8 +40,17 @@ export class ListOrdersByUserComponent implements OnInit{
     .subscribe( data => {
       this.orders = data;
       this.submitted=true;
+      this.userIdForm.reset();
     }, error=>{
-      console.log(error);
+      if(error.status === 404){
+        this.isUserIdAbsent=true;
+        setTimeout(()=>{
+          this.userIdForm.reset();
+          this.isUserIdAbsent=false;
+        },2000)
+      }else{
+        console.log(error);
+      }   
     });
   }
 }

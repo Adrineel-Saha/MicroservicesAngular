@@ -7,6 +7,9 @@
             <div *ngIf= "productNameControl.touched && productNameControl.errors?.['required']">
                 <p style="color: red;">Product_Name cannot be blank</p>
             </div>
+            <div *ngIf= "productNameControl.touched && isProductNameAbsent"> 
+                <p style="color: red;">No Product present with this Product_Name</p> 
+            </div>
         </div>
 
         <br>

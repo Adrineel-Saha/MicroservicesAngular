@@ -8,6 +8,8 @@ import { ListUsersComponent } from './components/list-users/list-users.component
 import { ListProductsByNameComponent } from './components/list-products-by-name/list-products-by-name.component';
 import { ListOrdersByUserComponent } from './components/list-orders-by-user/list-orders-by-user.component';
 import { ListItemsByProductComponent } from './components/list-items-by-product/list-items-by-product.component';
+import { UpdateUserComponent } from './components/update-user/update-user.component';
+import { UpdateProductComponent } from './components/update-product/update-product.component';
 
 const routes: Routes = [
   {path: 'createUser', component: CreateUserComponent},
@@ -17,7 +19,9 @@ const routes: Routes = [
   {path: 'listUsers', component: ListUsersComponent},
   {path: 'listProductsByName', component: ListProductsByNameComponent},
   {path: 'listOrdersByUser', component: ListOrdersByUserComponent},
-  {path: 'listItemsByProduct', component: ListItemsByProductComponent}
+  {path: 'listItemsByProduct', component: ListItemsByProductComponent},
+  {path: 'updateUser', component: UpdateUserComponent},
+  {path: 'updateProduct', component: UpdateProductComponent},
 ];
 
 @NgModule({

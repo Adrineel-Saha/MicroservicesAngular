@@ -1,0 +1,85 @@
+<h3>Update an existing Product</h3>
+<div [hidden]="showFormInitial" style="width: 400px;">
+    <form [formGroup]="productIdForm" (ngSubmit)="onUpdate()">
+        <div class="form-group">
+            <label for="productId">Enter Product_Id:</label>
+            <input type="number" class="form-control" id="productId" name="productId" formControlName="productId">
+            <div *ngIf= "productIdControlOne.touched && productIdControlOne.errors?.['required']">
+                <p style="color: red;">Product_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "productIdControlOne.touched && productIdControlOne.errors?.['min']">
+                <p style="color: red;">Product_Id should be positive</p>
+            </div>
+            <div *ngIf= "productIdControlOne.touched && isProductIdAbsent"> 
+                <p style="color: red;">No Product present with this Product_Id</p> 
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!productIdForm.valid">Update User</button>
+    </form>
+</div>
+
+<div [hidden]="showForm || !showFormInitial" style="width: 400px;">
+    <form [formGroup]="updateProductForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="productId">Product_Id:</label>
+            <input type="number" class="form-control" id="productId" name="productId" formControlName="productId" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="name">Product_Name:</label>
+            <input type="text" class="form-control" id="name" name="name" formControlName="name">
+            <div *ngIf= "productNameControl.touched && productNameControl.errors?.['required']">
+                <p style="color: red;">Product_Name cannot be blank</p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" class="form-control" id="description" name="description" formControlName="description">
+            <div *ngIf= "descriptionControl.touched && descriptionControl.errors?.['required']">
+                <p style="color: red;">Description cannot be blank</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" class="form-control" id="price" name="price" formControlName="price">
+            <div *ngIf= "priceControl.touched && priceControl.errors?.['required']">
+                <p style="color: red;">Price cannot be blank</p>
+            </div>
+            <div *ngIf= "priceControl.touched && priceControl.errors?.['min']">
+                <p style="color: red;">Price should be positive</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="stock">Stock:</label>
+            <input type="number" class="form-control" id="stock" name="stock" formControlName="stock">
+            <div *ngIf= "stockControl.touched && stockControl.errors?.['required']">
+                <p style="color: red;">Stock cannot be blank</p>
+            </div>
+            <div *ngIf= "stockControl.touched && stockControl.errors?.['min']">
+                <p style="color: red;">Stock cannot less then 0</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!updateProductForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>Product updated successfully!</h4>
+</div>

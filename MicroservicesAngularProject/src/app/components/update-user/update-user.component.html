@@ -1,0 +1,71 @@
+<h3>Update an existing User</h3>
+<div [hidden]="showFormInitial" style="width: 400px;">
+    <form [formGroup]="userIdForm" (ngSubmit)="onUpdate()">
+        <div class="form-group">
+            <label for="userId">Enter User_Id:</label>
+            <input type="number" class="form-control" id="userId" name="userId" formControlName="userId">
+            <div *ngIf= "userIdControlOne.touched && userIdControlOne.errors?.['required']">
+                <p style="color: red;">User_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "userIdControlOne.touched && userIdControlOne.errors?.['min']">
+                <p style="color: red;">User_Id should be positive</p>
+            </div>
+            <div *ngIf= "userIdControlOne.touched && isUserIdAbsent"> 
+                <p style="color: red;">No User present with this User_Id</p> 
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!userIdForm.valid">Update User</button>
+    </form>
+</div>
+
+<div [hidden]="showForm || !showFormInitial" style="width: 400px;">
+    <form [formGroup]="updateUserForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="userId">User_Id:</label>
+            <input type="number" class="form-control" id="userId" name="userId" formControlName="userId" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="userName">User_Name:</label>
+            <input type="text" class="form-control" id="userName" name="userName" formControlName="userName">
+            <div *ngIf= "userNameControl.touched && userNameControl.errors?.['required']">
+                <p style="color: red;">User_Name cannot be blank</p>
+            </div>
+            <div *ngIf= "userNameControl.touched && userNameControl.errors?.['minlength']">
+                <p style="color: red;">User_Name must be atleast 3 characters long</p>
+            </div>
+            <div *ngIf= "userNameControl.touched && userNameControl.errors?.['maxlength']">
+                <p style="color: red;">User_Name must be maximum 50 characters long</p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" class="form-control" id="email" name="email" formControlName="email">
+            <div *ngIf= "emailControl.touched && emailControl.errors?.['required']">
+                <p style="color: red;">Email cannot be blank</p>
+            </div>
+            <div *ngIf= "emailControl.touched && emailControl.errors?.['pattern']">
+                <p style="color: red;">Please enter a valid email</p>
+            </div>
+            <div *ngIf= "emailControl.touched && isEmailExists">
+                <p style="color: red;">Email Already Exists</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!updateUserForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>User updated successfully!</h4>
+</div>
