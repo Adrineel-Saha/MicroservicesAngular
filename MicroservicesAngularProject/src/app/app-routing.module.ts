@@ -10,6 +10,8 @@ import { ListOrdersByUserComponent } from './components/list-orders-by-user/list
 import { ListItemsByProductComponent } from './components/list-items-by-product/list-items-by-product.component';
 import { UpdateUserComponent } from './components/update-user/update-user.component';
 import { UpdateProductComponent } from './components/update-product/update-product.component';
+import { UpdateOrderComponent } from './components/update-order/update-order.component';
+import { UpdateOrderItemComponent } from './components/update-order-item/update-order-item.component';
 
 const routes: Routes = [
   {path: 'createUser', component: CreateUserComponent},
@@ -22,6 +24,8 @@ const routes: Routes = [
   {path: 'listItemsByProduct', component: ListItemsByProductComponent},
   {path: 'updateUser', component: UpdateUserComponent},
   {path: 'updateProduct', component: UpdateProductComponent},
+  {path: 'updateOrder', component: UpdateOrderComponent},
+  {path: 'updateOrderItem', component: UpdateOrderItemComponent}
 ];
 
 @NgModule({

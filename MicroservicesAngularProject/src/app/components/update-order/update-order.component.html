@@ -1,0 +1,80 @@
+<h3>Update an existing Order</h3>
+<div [hidden]="showFormInitial" style="width: 400px;">
+    <form [formGroup]="orderIdForm" (ngSubmit)="onUpdate()">
+        <div class="form-group">
+            <label for="orderId">Enter Order_Id:</label>
+            <input type="number" class="form-control" id="orderId" name="orderId" formControlName="orderId">
+            <div *ngIf= "orderIdControlOne.touched && orderIdControlOne.errors?.['required']">
+                <p style="color: red;">Order_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "orderIdControlOne.touched && orderIdControlOne.errors?.['min']">
+                <p style="color: red;">Order_Id should be positive</p>
+            </div>
+            <div *ngIf= "orderIdControlOne.touched && isOrderAbsent"> 
+                <p style="color: red;">No Order present with this Order_Id</p> 
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!orderIdForm.valid">Update Order</button>
+    </form>
+</div>
+
+<div [hidden]="showForm || !showFormInitial" style="width: 400px;">
+    <form [formGroup]="updateOrderStatusForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="id">Order_Id:</label>
+            <input type="number" class="form-control" id="id" name="id" formControlName="id" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="userId">User_Id:</label>
+            <input type="number" class="form-control" id="userId" name="userId" formControlName="userId" readsonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <input type="text" class="form-control" id="status" name="status" formControlName="status">
+            <div *ngIf= "statusControl.touched && statusControl.errors?.['required']">
+                <p style="color: red;">Status cannot be blank</p>
+            </div>
+            <div *ngIf= "statusControl.touched && statusControl.errors?.['pattern']">
+                <p style="color: red;">Status must be one of: CREATED, PAID, SHIPPED, CANCELLED</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="userId">Created_At:</label>
+            <input type="date" class="form-control" id="userId" name="userId" formControlName="userId" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="userName">User_Name:</label>
+            <input type="text" class="form-control" id="userName" name="userName" formControlName="userName" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" class="form-control" id="email" name="email" formControlName="email" readonly>
+        </div>
+        
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!updateOrderStatusForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>Order updated successfully!</h4>
+</div>

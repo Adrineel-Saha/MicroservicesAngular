@@ -17,15 +17,15 @@
 
         <br>
 
-        <button type="submit" class="btn btn-success" [disabled]="!productIdForm.valid">Update User</button>
+        <button type="submit" class="btn btn-success" [disabled]="!productIdForm.valid">Update Product</button>
     </form>
 </div>
 
 <div [hidden]="showForm || !showFormInitial" style="width: 400px;">
     <form [formGroup]="updateProductForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
-            <label for="productId">Product_Id:</label>
-            <input type="number" class="form-control" id="productId" name="productId" formControlName="productId" readonly>
+            <label for="id">Product_Id:</label>
+            <input type="number" class="form-control" id="id" name="id" formControlName="id" readonly>
         </div>
 
         <br>

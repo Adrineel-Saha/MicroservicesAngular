@@ -50,7 +50,7 @@ export class UpdateUserComponent implements OnInit{
     });
 
     this.updateUserForm=new FormGroup({
-      userId: this.userIdControlTwo,
+      id: this.userIdControlTwo,
       userName: this.userNameControl,
       email: this.emailControl
     });

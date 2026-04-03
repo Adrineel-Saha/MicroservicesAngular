@@ -1,0 +1,100 @@
+<h3>Update an existing Order Item</h3>
+<div [hidden]="showFormInitial" style="width: 400px;">
+    <form [formGroup]="itemIdForm" (ngSubmit)="onUpdate()">
+        <div class="form-group">
+            <label for="itemId">Enter Item_Id:</label>
+            <input type="number" class="form-control" id="itemId" name="itemId" formControlName="itemId">
+            <div *ngIf= "itemIdControlOne.touched && itemIdControlOne.errors?.['required']">
+                <p style="color: red;">Item_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "itemIdControlOne.touched && itemIdControlOne.errors?.['min']">
+                <p style="color: red;">Item_Id should be positive</p>
+            </div>
+            <div *ngIf= "itemIdControlOne.touched && isItemAbsent"> 
+                <p style="color: red;">No Item present with this Item_Id</p> 
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!itemIdForm.valid">Update Item</button>
+    </form>
+</div>
+
+<div [hidden]="showForm || !showFormInitial" style="width: 400px;">
+    <form [formGroup]="updateOrderItemForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="id">Item_Id:</label>
+            <input type="number" class="form-control" id="id" name="id" formControlName="id" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="productId">Product_Id:</label>
+            <input type="number" class="form-control" id="productId" name="productId" formControlName="productId">
+            <div *ngIf= "productIdControl.touched && productIdControl.errors?.['required']">
+                <p style="color: red;">Product_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "productIdControl.touched && productIdControl.errors?.['min']">
+                <p style="color: red;">Product_Id must be a positive number</p>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="quantity">Quantity:</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" formControlName="quantity">
+            <div *ngIf= "quantityControl.touched && quantityControl.errors?.['required']">
+                <p style="color: red;">Quantity cannot be blank</p>
+            </div>
+            <div *ngIf= "quantityControl.touched && quantityControl.errors?.['min']">
+                <p style="color: red;">Quantity must be at least 1</p>
+            </div>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" class="form-control" id="price" name="price" formControlName="price" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="orderId">Order_Id:</label>
+            <input type="number" class="form-control" id="orderId" name="orderId" formControlName="orderId" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="name">Product_Name:</label>
+            <input type="text" class="form-control" id="name" name="name" formControlName="name" readonly>
+        </div>
+        
+        <br>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" class="form-control" id="description" name="description" formControlName="description" readonly>
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" class="form-control" id="price" name="price" formControlName="price" readonly>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-success" [disabled]="!updateOrderItemForm.valid">Submit</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>Order Item updated successfully!</h4>
+</div>

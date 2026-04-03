@@ -16,6 +16,8 @@ import { ListOrdersByUserComponent } from './components/list-orders-by-user/list
 import { ListItemsByProductComponent } from './components/list-items-by-product/list-items-by-product.component';
 import { UpdateUserComponent } from './components/update-user/update-user.component';
 import { UpdateProductComponent } from './components/update-product/update-product.component';
+import { UpdateOrderComponent } from './components/update-order/update-order.component';
+import { UpdateOrderItemComponent } from './components/update-order-item/update-order-item.component';
 
 
 @NgModule({
@@ -31,7 +33,9 @@ import { UpdateProductComponent } from './components/update-product/update-produ
     ListOrdersByUserComponent,
     ListItemsByProductComponent,
     UpdateUserComponent,
-    UpdateProductComponent
+    UpdateProductComponent,
+    UpdateOrderComponent,
+    UpdateOrderItemComponent
   ],
   imports: [
     BrowserModule,

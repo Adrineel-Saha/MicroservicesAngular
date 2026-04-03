@@ -53,7 +53,7 @@ export class UpdateProductComponent implements OnInit {
       });
   
       this.updateProductForm=new FormGroup({
-        productId: this.productIdControlTwo,
+        id: this.productIdControlTwo,
         name: this.productNameControl,
         description: this.descriptionControl,
         price: this.priceControl,
