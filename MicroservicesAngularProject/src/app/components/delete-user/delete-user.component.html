@@ -1,0 +1,26 @@
+<h3>Delete an existing User</h3>
+<div [hidden]="submitted" style="width: 400px;">
+    <form [formGroup]="userIdForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="userId">Enter User_Id:</label>
+            <input type="number" class="form-control" id="userId" name="userId" formControlName="userId">
+            <div *ngIf= "userIdControl.touched && userIdControl.errors?.['required']">
+                <p style="color: red;">User_Id cannot be blank</p>
+            </div>
+            <div *ngIf= "userIdControl.touched && userIdControl.errors?.['min']">
+                <p style="color: red;">User_Id should be positive</p>
+            </div>
+            <div *ngIf= "userIdControl.touched && isUserIdAbsent"> 
+                <p style="color: red;">No User present with this User_Id</p> 
+            </div>
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-danger" [disabled]="!userIdForm.valid">Delete User</button>
+    </form>
+</div>
+
+<div [hidden]="!submitted">
+    <h4>{{result}}</h4>
+</div>

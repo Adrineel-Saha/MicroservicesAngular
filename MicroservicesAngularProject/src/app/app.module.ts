@@ -18,6 +18,7 @@ import { UpdateUserComponent } from './components/update-user/update-user.compon
 import { UpdateProductComponent } from './components/update-product/update-product.component';
 import { UpdateOrderComponent } from './components/update-order/update-order.component';
 import { UpdateOrderItemComponent } from './components/update-order-item/update-order-item.component';
+import { DeleteUserComponent } from './components/delete-user/delete-user.component';
 
 
 @NgModule({
@@ -35,7 +36,8 @@ import { UpdateOrderItemComponent } from './components/update-order-item/update-
     UpdateUserComponent,
     UpdateProductComponent,
     UpdateOrderComponent,
-    UpdateOrderItemComponent
+    UpdateOrderItemComponent,
+    DeleteUserComponent
   ],
   imports: [
     BrowserModule,

@@ -56,8 +56,9 @@ export class UpdateOrderComponent implements OnInit{
 
     this.updateOrderStatusForm=new FormGroup({
       id: this.orderIdControlTwo,
-      userId: this.userNameControl,
+      userId: this.userIdControl,
       status: this.statusControl,
+      createdAt: this.createdAtControl,
       userName: this.userNameControl,
       email: this.emailControl
     })

@@ -42,7 +42,7 @@ export class ListOrdersByUserComponent implements OnInit{
       this.submitted=true;
       this.userIdForm.reset();
     }, error=>{
-      if(error.status === 404){
+      if(error.status === 400){
         this.isUserIdAbsent=true;
         setTimeout(()=>{
           this.userIdForm.reset();

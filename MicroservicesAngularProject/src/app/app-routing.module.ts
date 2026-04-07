@@ -12,6 +12,7 @@ import { UpdateUserComponent } from './components/update-user/update-user.compon
 import { UpdateProductComponent } from './components/update-product/update-product.component';
 import { UpdateOrderComponent } from './components/update-order/update-order.component';
 import { UpdateOrderItemComponent } from './components/update-order-item/update-order-item.component';
+import { DeleteUserComponent } from './components/delete-user/delete-user.component';
 
 const routes: Routes = [
   {path: 'createUser', component: CreateUserComponent},
@@ -25,7 +26,8 @@ const routes: Routes = [
   {path: 'updateUser', component: UpdateUserComponent},
   {path: 'updateProduct', component: UpdateProductComponent},
   {path: 'updateOrder', component: UpdateOrderComponent},
-  {path: 'updateOrderItem', component: UpdateOrderItemComponent}
+  {path: 'updateOrderItem', component: UpdateOrderItemComponent},
+  {path: 'deleteUser', component: DeleteUserComponent}
 ];
 
 @NgModule({

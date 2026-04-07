@@ -40,7 +40,7 @@ export class ListItemsByProductComponent implements OnInit{
       this.submitted=true;
       this.productIdForm.reset();
     }, error=>{
-      if(error.status === 404){
+      if(error.status === 400){
         this.isProductIdAbsent=true;
         setTimeout(()=>{
           this.productIdForm.reset();

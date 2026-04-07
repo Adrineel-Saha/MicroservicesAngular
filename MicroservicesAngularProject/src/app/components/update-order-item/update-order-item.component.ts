@@ -72,6 +72,7 @@ export class UpdateOrderItemComponent implements OnInit{
 
   onUpdate(){
     this.itemId=this.itemIdForm.get('itemId')?.value;
+    console.log("Item_Id"+this.itemId);
     this.orderService.getItem(this.itemId).subscribe(
       data=>{
         this.item=data;
