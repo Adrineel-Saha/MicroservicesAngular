@@ -12,26 +12,26 @@ export class ProductService {
   private backendProductURI= "http://localhost:9191/api/products";
   
   public createProduct(product:Product){
-    return this.http.post<Product>(this.backendProductURI,product);
+    return this.http.post<Product>(this.backendProductURI,product, {observe: 'response'});
   }
 
   public getAllProducts(){
-    return this.http.get<Product[]>(this.backendProductURI);
+    return this.http.get<Product[]>(this.backendProductURI, {observe: 'response'});
   }
 
   public getProduct(productId:number){
-    return this.http.get<Product>(this.backendProductURI+"/id/"+productId);
+    return this.http.get<Product>(this.backendProductURI+"/id/"+productId, {observe: 'response'});
   }
 
   public getProductsByName(name:string){
-    return this.http.get<Product[]>(this.backendProductURI+"/name/"+name);
+    return this.http.get<Product[]>(this.backendProductURI+"/name/"+name, {observe: 'response'});
   }
 
   public updateProduct(productId:number,product:Product){
-    return this.http.put<Product>(this.backendProductURI+"/"+productId,product);
+    return this.http.put<Product>(this.backendProductURI+"/"+productId,product, {observe: 'response'});
   }
 
-  public deleteUser(productId:number){
-    return this.http.delete<string>(this.backendProductURI+"/"+productId,{responseType:'text' as 'json'});
+  public deleteProduct(productId:number){
+    return this.http.delete<string>(this.backendProductURI+"/"+productId, {responseType: 'text' as 'json', observe: 'response'});
   }
 }

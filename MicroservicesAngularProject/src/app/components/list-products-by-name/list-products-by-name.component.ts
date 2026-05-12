@@ -37,8 +37,8 @@ export class ListProductsByNameComponent implements OnInit{
     // console.log("ProductName "+this.productName);
 
     this.productService.getProductsByName(this.productName)
-    .subscribe( data => {
-      this.products = data;
+    .subscribe( response => {
+      this.products = response.body ?? [];
       this.submitted=true;
       this.productNameForm.reset();
     }, error=>{

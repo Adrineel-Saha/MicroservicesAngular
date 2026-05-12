@@ -74,8 +74,8 @@ export class UpdateOrderItemComponent implements OnInit{
     this.itemId=this.itemIdForm.get('itemId')?.value;
     console.log("Item_Id"+this.itemId);
     this.orderService.getItem(this.itemId).subscribe(
-      data=>{
-        this.item=data;
+      response=>{
+        this.item=response.body ?? new OrderItem();
         this.updateOrderItemForm.patchValue(this.item);
         this.showFormInitial=true;
         this.itemIdForm.reset();
@@ -95,8 +95,8 @@ export class UpdateOrderItemComponent implements OnInit{
 
   onSubmit(){
     this.item=this.updateOrderItemForm.getRawValue();
-    this.orderService.updateItem(this.itemId,this.item).subscribe(data=>{
-      console.log(data);
+    this.orderService.updateItem(this.itemId,this.item).subscribe(response=>{
+      console.log(response.body);
           this.showForm=true;
           this.submitted=true;
           this.updateOrderItemForm.reset();

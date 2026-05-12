@@ -36,8 +36,8 @@ export class CreateOrderComponent implements OnInit{
     this.order=this.orderForm.value;
 
     this.orderService.createOrder(this.order).subscribe(
-      data=>{
-        console.log(data);
+      response=>{
+        console.log(response.body);
         this.submitted=true;
         this.orderForm.reset();
     },error=>{

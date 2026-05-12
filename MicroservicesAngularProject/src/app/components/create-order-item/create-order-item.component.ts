@@ -39,8 +39,8 @@ export class CreateOrderItemComponent implements OnInit {
     this.orderItem=this.orderItemForm.value;
 
     this.orderItemService.addItem(this.orderItem).subscribe(
-      data=>{
-        console.log(data);
+      response=>{
+        console.log(response.body);
         this.submitted=true;
         this.orderItemForm.reset();
     },error=>{

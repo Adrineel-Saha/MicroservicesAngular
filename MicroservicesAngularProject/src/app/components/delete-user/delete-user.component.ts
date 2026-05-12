@@ -33,9 +33,9 @@ export class DeleteUserComponent implements OnInit{
     this.userId=this.userIdForm.get('userId')?.value;
 
     this.userService.deleteUser(this.userId).subscribe(
-      data=>{
-        console.log(data);
-        this.result=data;
+      response=>{
+        console.log(response.body);
+        this.result=response.body ?? '';
         this.submitted=true;
         this.userIdForm.reset();
       }, error=>{

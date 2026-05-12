@@ -1,10 +1,10 @@
 export class OrderItem {
-    id!: number;
+    id?: number;
     productId!: number;
     quantity!: number;
-    price!: number;
+    price?: number;
     orderId!: number;
-    name!: string;
-    description!: string;
-    stock!: number;
+    name?: string;
+    description?: string;
+    stock?: number;
 }

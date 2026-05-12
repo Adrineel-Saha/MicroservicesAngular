@@ -35,8 +35,8 @@ export class CreateUserComponent implements OnInit{
       this.user=this.userForm.value;
 
       this.userService.createUser(this.user).subscribe(
-        data=>{
-          console.log(data);
+        response=>{
+          console.log(response.body);
           this.submitted=true;
           this.userForm.reset();
       },error=>{

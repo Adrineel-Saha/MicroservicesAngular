@@ -35,8 +35,8 @@ export class ListItemsByProductComponent implements OnInit{
     this.productId=this.productIdForm.get('productId')?.value;
 
     this.orderService.listItemsByProduct(this.productId)
-    .subscribe( data => {
-      this.orderItems = data;
+    .subscribe( response => {
+      this.orderItems = response.body ?? [];
       this.submitted=true;
       this.productIdForm.reset();
     }, error=>{

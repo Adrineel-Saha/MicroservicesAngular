@@ -37,8 +37,8 @@ export class ListOrdersByUserComponent implements OnInit{
     // console.log("ProductName "+this.productName);
 
     this.orderService.listOrdersByUser(this.userId)
-    .subscribe( data => {
-      this.orders = data;
+    .subscribe( response => {
+      this.orders = response.body ?? [];
       this.submitted=true;
       this.userIdForm.reset();
     }, error=>{

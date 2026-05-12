@@ -59,8 +59,8 @@ export class UpdateUserComponent implements OnInit{
   onUpdate(){
     this.userId=this.userIdForm.get('userId')?.value;
     this.userService.getUser(this.userId).subscribe(
-      data=>{
-        this.user=data;
+      response=>{
+        this.user=response.body ?? new User();
         this.updateUserForm.patchValue(this.user);
         this.showFormInitial=true
         this.userIdForm.reset();
@@ -80,8 +80,8 @@ export class UpdateUserComponent implements OnInit{
   onSubmit(){
     this.user=this.updateUserForm.getRawValue();
     this.userService.updateUser(this.userId,this.user).subscribe(
-      data=>{
-        console.log(data);
+      response=>{
+        console.log(response.body);
         this.showForm=true;
         this.submitted=true;
         this.updateUserForm.reset();

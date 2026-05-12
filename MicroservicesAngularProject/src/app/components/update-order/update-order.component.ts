@@ -67,8 +67,8 @@ export class UpdateOrderComponent implements OnInit{
   onUpdate(){
     this.orderId=this.orderIdForm.get('orderId')?.value;
     this.orderService.getOrder(this.orderId).subscribe(
-      data=>{
-        this.order=data;
+      response=>{
+        this.order=response.body ?? new Order();
         this.updateOrderStatusForm.patchValue(this.order);
         this.showFormInitial=true;
         this.orderIdForm.reset();
@@ -88,8 +88,8 @@ export class UpdateOrderComponent implements OnInit{
 
   onSubmit(){
     this.order=this.updateOrderStatusForm.getRawValue();
-    this.orderService.updateOrderStatus(this.orderId,this.order.status).subscribe(data=>{
-      console.log(data);
+    this.orderService.updateOrderStatus(this.orderId,this.order.status).subscribe(response=>{
+      console.log(response.body);
           this.showForm=true;
           this.submitted=true;
           this.updateOrderStatusForm.reset();

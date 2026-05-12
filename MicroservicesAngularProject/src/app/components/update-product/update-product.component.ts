@@ -64,8 +64,8 @@ export class UpdateProductComponent implements OnInit {
     onUpdate(){
       this.productId=this.productIdForm.get('productId')?.value;
       this.productService.getProduct(this.productId).subscribe(
-        data=>{
-          this.product=data;
+        response=>{
+          this.product=response.body ?? new Product();
           this.updateProductForm.patchValue(this.product);
           this.showFormInitial=true
           this.productIdForm.reset();
@@ -85,8 +85,8 @@ export class UpdateProductComponent implements OnInit {
     onSubmit(){
       this.product=this.updateProductForm.getRawValue();
       this.productService.updateProduct(this.productId,this.product).subscribe(
-        data=>{
-          console.log(data);
+        response=>{
+          console.log(response.body);
           this.showForm=true;
           this.submitted=true;
           this.updateProductForm.reset();
