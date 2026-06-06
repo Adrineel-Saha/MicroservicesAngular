@@ -1,23 +1,95 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpResponse } from '@angular/common/http';
+import { of, throwError } from 'rxjs';
 
-// import { UpdateUserComponent } from './update-user.component';
+import { UpdateUserComponent } from './update-user.component';
+import { UserService } from 'src/app/services/user.service';
+import { MockUsers } from 'src/app/mockdata/user.mock';
 
-// describe('UpdateUserComponent', () => {
-//   let component: UpdateUserComponent;
-//   let fixture: ComponentFixture<UpdateUserComponent>;
+describe('UpdateUserComponent', () => {
+  let component: UpdateUserComponent;
+  let fixture: ComponentFixture<UpdateUserComponent>;
+  let userServiceSpy: jasmine.SpyObj<UserService>;
 
-//   beforeEach(async () => {
-//     await TestBed.configureTestingModule({
-//       declarations: [ UpdateUserComponent ]
-//     })
-//     .compileComponents();
+  const mockUser = MockUsers[0];
 
-//     fixture = TestBed.createComponent(UpdateUserComponent);
-//     component = fixture.componentInstance;
-//     fixture.detectChanges();
-//   });
+  beforeEach(async () => {
+    userServiceSpy = jasmine.createSpyObj('UserService', ['getUser', 'updateUser']);
 
-//   it('should create', () => {
-//     expect(component).toBeTruthy();
-//   });
-// });
+    await TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule],
+      declarations: [UpdateUserComponent],
+      providers: [{ provide: UserService, useValue: userServiceSpy }]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(UpdateUserComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should initialize with both forms and flags reset', () => {
+    expect(component.showFormInitial).toBeFalse();
+    expect(component.showForm).toBeFalse();
+    expect(component.submitted).toBeFalse();
+    expect(component.isUserIdAbsent).toBeFalse();
+    expect(component.isEmailExists).toBeFalse();
+    expect(component.userIdForm.valid).toBeFalse();
+    expect(component.updateUserForm.valid).toBeFalse();
+  });
+
+  it('onUpdate should fetch the user and patch the update form', () => {
+    userServiceSpy.getUser.and.returnValue(of(new HttpResponse({ body: mockUser, status: 200 })));
+
+    component.userIdForm.setValue({ userId: mockUser.id });
+    component.onUpdate();
+
+    expect(userServiceSpy.getUser).toHaveBeenCalledWith(mockUser.id);
+    expect(component.userId).toBe(mockUser.id);
+    expect(component.showFormInitial).toBeTrue();
+    expect(component.updateUserForm.get('userName')?.value).toBe(mockUser.userName);
+    expect(component.updateUserForm.get('email')?.value).toBe(mockUser.email);
+  });
+
+  it('onUpdate should flag a missing user on 404 and clear it after 2s', fakeAsync(() => {
+    userServiceSpy.getUser.and.returnValue(throwError(() => ({ status: 404 })));
+
+    component.userIdForm.setValue({ userId: 99 });
+    component.onUpdate();
+
+    expect(component.isUserIdAbsent).toBeTrue();
+    tick(2000);
+    expect(component.isUserIdAbsent).toBeFalse();
+  }));
+
+  it('onSubmit should update the user and set the success flags', () => {
+    userServiceSpy.updateUser.and.returnValue(of(new HttpResponse({ body: mockUser, status: 202 })));
+
+    component.userId = mockUser.id;
+    component.updateUserForm.setValue(mockUser);
+    component.onSubmit();
+
+    expect(userServiceSpy.updateUser).toHaveBeenCalledWith(mockUser.id, mockUser as any);
+    expect(component.showForm).toBeTrue();
+    expect(component.submitted).toBeTrue();
+  });
+
+  it('onSubmit should flag a duplicate email on a 400 and clear it after 2s', fakeAsync(() => {
+    userServiceSpy.updateUser.and.returnValue(
+      throwError(() => ({ status: 400, error: 'User Already Exists with Email Id: ' + mockUser.email }))
+    );
+
+    component.userId = mockUser.id;
+    component.updateUserForm.setValue(mockUser);
+    component.onSubmit();
+
+    expect(component.isEmailExists).toBeTrue();
+    expect(component.submitted).toBeFalse();
+    tick(2000);
+    expect(component.isEmailExists).toBeFalse();
+  }));
+});

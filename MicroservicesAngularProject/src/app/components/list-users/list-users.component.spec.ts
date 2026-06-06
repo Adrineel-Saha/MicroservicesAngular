@@ -1,23 +1,56 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpResponse } from '@angular/common/http';
+import { of, throwError } from 'rxjs';
 
-// import { ListUsersComponent } from './list-users.component';
+import { ListUsersComponent } from './list-users.component';
+import { UserService } from 'src/app/services/user.service';
+import { MockUsers } from 'src/app/mockdata/user.mock';
 
-// describe('ListUsersComponent', () => {
-//   let component: ListUsersComponent;
-//   let fixture: ComponentFixture<ListUsersComponent>;
+describe('ListUsersComponent', () => {
+  let component: ListUsersComponent;
+  let fixture: ComponentFixture<ListUsersComponent>;
+  let userServiceSpy: jasmine.SpyObj<UserService>;
 
-//   beforeEach(async () => {
-//     await TestBed.configureTestingModule({
-//       declarations: [ ListUsersComponent ]
-//     })
-//     .compileComponents();
+  beforeEach(async () => {
+    userServiceSpy = jasmine.createSpyObj('UserService', ['getAllUsers']);
+    userServiceSpy.getAllUsers.and.returnValue(of(new HttpResponse({ body: MockUsers, status: 200 })));
 
-//     fixture = TestBed.createComponent(ListUsersComponent);
-//     component = fixture.componentInstance;
-//     fixture.detectChanges();
-//   });
+    await TestBed.configureTestingModule({
+      declarations: [ListUsersComponent],
+      providers: [{ provide: UserService, useValue: userServiceSpy }]
+    }).compileComponents();
 
-//   it('should create', () => {
-//     expect(component).toBeTruthy();
-//   });
-// });
+    fixture = TestBed.createComponent(ListUsersComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should create', () => {
+    fixture.detectChanges();
+    expect(component).toBeTruthy();
+  });
+
+  it('should load all users on init', () => {
+    fixture.detectChanges();
+    expect(userServiceSpy.getAllUsers).toHaveBeenCalled();
+    expect(component.users).toEqual(MockUsers);
+    expect(component.users.length).toBe(5);
+  });
+
+  it('should render a table row for every user', () => {
+    fixture.detectChanges();
+    const rows = (fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr');
+    expect(rows.length).toBe(MockUsers.length);
+  });
+
+  it('should default to an empty array when the response body is null', () => {
+    userServiceSpy.getAllUsers.and.returnValue(of(new HttpResponse<any>({ body: null, status: 200 })));
+    fixture.detectChanges();
+    expect(component.users).toEqual([]);
+  });
+
+  it('should leave users unset when the service errors', () => {
+    userServiceSpy.getAllUsers.and.returnValue(throwError(() => ({ status: 400 })));
+    fixture.detectChanges();
+    expect(component.users).toBeUndefined();
+  });
+});
