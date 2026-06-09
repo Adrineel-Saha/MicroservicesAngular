@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockOrders } from 'src/app/mockdata/order.mock';
 describe('ListOrdersByUserComponent', () => {
   let component: ListOrdersByUserComponent;
   let fixture: ComponentFixture<ListOrdersByUserComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let orderServiceSpy: jasmine.SpyObj<OrderService>;
 
   beforeEach(async () => {
@@ -23,6 +27,8 @@ describe('ListOrdersByUserComponent', () => {
 
     fixture = TestBed.createComponent(ListOrdersByUserComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -82,5 +88,35 @@ describe('ListOrdersByUserComponent', () => {
 
     expect(component.isUserIdAbsent).toBeFalse();
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('List Orders By Users');
+  });
+
+  it('should render a single userId input and keep submit disabled until valid', () => {
+    const input = debugElement.query(By.css('#userId'));
+    expect(input).toBeTruthy();
+    expect(nativeElement.querySelector('#userId')).toBe(input.nativeElement);
+
+    const button = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(button.disabled).toBeTrue();
+
+    component.userIdForm.setValue({ userId: 1 });
+    fixture.detectChanges();
+    expect(button.disabled).toBeFalse();
+  });
+
+  it('should render a table row per order after a successful search', () => {
+    orderServiceSpy.listOrdersByUser.and.returnValue(of(new HttpResponse({ body: MockOrders, status: 200 })));
+
+    component.userIdForm.setValue({ userId: 1 });
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(MockOrders.length);
+    expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockOrders[0].status);
   });
 });

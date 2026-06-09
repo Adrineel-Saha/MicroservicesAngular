@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockUsers } from 'src/app/mockdata/user.mock';
 describe('DeleteUserComponent', () => {
   let component: DeleteUserComponent;
   let fixture: ComponentFixture<DeleteUserComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let userServiceSpy: jasmine.SpyObj<UserService>;
 
   const mockUser = MockUsers[0];
@@ -25,6 +29,8 @@ describe('DeleteUserComponent', () => {
 
     fixture = TestBed.createComponent(DeleteUserComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -76,5 +82,40 @@ describe('DeleteUserComponent', () => {
 
     expect(component.isUserIdAbsent).toBeFalse();
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('Delete an existing User');
+  });
+
+  it('should render a single userId input', () => {
+    const inputs = debugElement.queryAll(By.css('input'));
+    expect(inputs.length).toBe(1);
+    expect(nativeElement.querySelector('#userId')).toBeTruthy();
+  });
+
+  it('should keep the danger button disabled until the form is valid', () => {
+    const button = debugElement.query(By.css('button[type="submit"]'));
+    const buttonElement = button.nativeElement as HTMLButtonElement;
+    expect(buttonElement.textContent?.trim()).toBe('Delete User');
+    expect(buttonElement.classList).toContain('btn-danger');
+    expect(buttonElement.disabled).toBeTrue();
+
+    component.userIdForm.setValue({ userId: mockUser.id });
+    fixture.detectChanges();
+    expect(buttonElement.disabled).toBeFalse();
+  });
+
+  it('should render the result message after a successful delete', () => {
+    const message = 'User deleted with Id: ' + mockUser.id;
+    userServiceSpy.deleteUser.and.returnValue(of(new HttpResponse({ body: message, status: 200 })));
+
+    component.userIdForm.setValue({ userId: mockUser.id });
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const result = debugElement.query(By.css('h4'));
+    expect((result.nativeElement as HTMLElement).textContent).toContain(message);
   });
 });

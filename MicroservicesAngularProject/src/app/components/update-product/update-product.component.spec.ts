@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockProducts } from 'src/app/mockdata/product.mock';
 describe('UpdateProductComponent', () => {
   let component: UpdateProductComponent;
   let fixture: ComponentFixture<UpdateProductComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let productServiceSpy: jasmine.SpyObj<ProductService>;
 
   const mockProduct = MockProducts[0];
@@ -25,6 +29,8 @@ describe('UpdateProductComponent', () => {
 
     fixture = TestBed.createComponent(UpdateProductComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -85,5 +91,35 @@ describe('UpdateProductComponent', () => {
 
     expect(component.showForm).toBeFalse();
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('Update an existing Product');
+  });
+
+  it('should render the lookup input and keep the Update Product button disabled until valid', () => {
+    const input = debugElement.query(By.css('#productId'));
+    expect(input).toBeTruthy();
+    expect(nativeElement.querySelector('#productId')).toBe(input.nativeElement);
+
+    const button = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(button.textContent?.trim()).toBe('Update Product');
+    expect(button.disabled).toBeTrue();
+
+    component.productIdForm.setValue({ productId: mockProduct.id });
+    fixture.detectChanges();
+    expect(button.disabled).toBeFalse();
+  });
+
+  it('should populate the edit form inputs after a successful lookup', () => {
+    productServiceSpy.getProduct.and.returnValue(of(new HttpResponse({ body: mockProduct, status: 200 })));
+
+    component.productIdForm.setValue({ productId: mockProduct.id });
+    component.onUpdate();
+    fixture.detectChanges();
+
+    const nameInput = debugElement.query(By.css('#name')).nativeElement as HTMLInputElement;
+    expect(nameInput.value).toBe(mockProduct.name);
   });
 });

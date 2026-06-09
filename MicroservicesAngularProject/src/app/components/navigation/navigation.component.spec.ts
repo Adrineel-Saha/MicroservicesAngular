@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { NavigationComponent } from './navigation.component';
@@ -6,6 +8,8 @@ import { NavigationComponent } from './navigation.component';
 describe('NavigationComponent', () => {
   let component: NavigationComponent;
   let fixture: ComponentFixture<NavigationComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
 
   const expectedLinks: { route: string; label: string }[] = [
     { route: '/createUser', label: 'Add New User' },
@@ -31,6 +35,8 @@ describe('NavigationComponent', () => {
 
     fixture = TestBed.createComponent(NavigationComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -39,47 +45,43 @@ describe('NavigationComponent', () => {
   });
 
   it('should render a navbar', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('nav.navbar')).toBeTruthy();
+    const navbar = debugElement.query(By.css('nav.navbar'));
+    expect(navbar).toBeTruthy();
+    expect(nativeElement.querySelector('nav.navbar')).toBe(navbar.nativeElement);
   });
 
   it('should render all navigation links', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const links = compiled.querySelectorAll('a.nav-link');
+    const links = debugElement.queryAll(By.css('a.nav-link'));
     expect(links.length).toBe(expectedLinks.length);
   });
 
   it('should render one nav-item per link', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const items = compiled.querySelectorAll('li.nav-item');
+    const items = debugElement.queryAll(By.css('li.nav-item'));
     expect(items.length).toBe(expectedLinks.length);
   });
 
   expectedLinks.forEach(({ route, label }) => {
     it(`should have a routerLink to ${route}`, () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      const links = Array.from(compiled.querySelectorAll('a.nav-link'));
+      const links = debugElement.queryAll(By.css('a.nav-link'));
       const target = links.find(
-        link => link.getAttribute('ng-reflect-router-link') === route
+        link => (link.nativeElement as HTMLElement).getAttribute('ng-reflect-router-link') === route
       );
       expect(target).toBeTruthy();
     });
 
     it(`should label the ${route} link as "${label}"`, () => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      const links = Array.from(compiled.querySelectorAll('a.nav-link'));
+      const links = debugElement.queryAll(By.css('a.nav-link'));
       const target = links.find(
-        link => link.getAttribute('ng-reflect-router-link') === route
+        link => (link.nativeElement as HTMLElement).getAttribute('ng-reflect-router-link') === route
       );
-      expect(target?.textContent?.trim()).toBe(label);
+      expect((target?.nativeElement as HTMLElement)?.textContent?.trim()).toBe(label);
     });
   });
 
   it('should not contain duplicate routerLinks', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const routes = Array.from(compiled.querySelectorAll('a.nav-link')).map(
-      link => link.getAttribute('ng-reflect-router-link')
-    );
+    const routes = debugElement
+      .queryAll(By.css('a.nav-link'))
+      .map(link => (link.nativeElement as HTMLElement).getAttribute('ng-reflect-router-link'));
     const uniqueRoutes = new Set(routes);
     expect(uniqueRoutes.size).toBe(routes.length);
   });

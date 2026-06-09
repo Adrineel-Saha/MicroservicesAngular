@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockOrderItems } from 'src/app/mockdata/order-item.mock';
 describe('CreateOrderItemComponent', () => {
   let component: CreateOrderItemComponent;
   let fixture: ComponentFixture<CreateOrderItemComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let orderServiceSpy: jasmine.SpyObj<OrderService>;
 
   const mockItem = MockOrderItems[0];
@@ -25,6 +29,8 @@ describe('CreateOrderItemComponent', () => {
 
     fixture = TestBed.createComponent(CreateOrderItemComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -66,5 +72,35 @@ describe('CreateOrderItemComponent', () => {
     component.onSubmit();
 
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('Add a New Order Item');
+  });
+
+  it('should render the productId, quantity and orderId inputs', () => {
+    const inputs = debugElement.queryAll(By.css('input'));
+    expect(inputs.length).toBe(3);
+    expect(debugElement.query(By.css('#productId'))).toBeTruthy();
+    expect(nativeElement.querySelector('#quantity')).toBeTruthy();
+  });
+
+  it('should keep the submit button disabled until the form is valid', () => {
+    const button = debugElement.query(By.css('button[type="submit"]'));
+    const buttonElement = button.nativeElement as HTMLButtonElement;
+    expect(buttonElement.textContent?.trim()).toBe('Submit');
+    expect(buttonElement.disabled).toBeTrue();
+
+    component.orderItemForm.patchValue(mockItem);
+    fixture.detectChanges();
+    expect(buttonElement.disabled).toBeFalse();
+  });
+
+  it('should show a validation message once productId is touched and blank', () => {
+    component.productIdControl.markAsTouched();
+    fixture.detectChanges();
+    const texts = debugElement.queryAll(By.css('p')).map(p => (p.nativeElement as HTMLElement).textContent?.trim());
+    expect(texts).toContain('Product_Id cannot be blank');
   });
 });

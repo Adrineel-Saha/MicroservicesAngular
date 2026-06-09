@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockProducts } from 'src/app/mockdata/product.mock';
 describe('ListProductsByNameComponent', () => {
   let component: ListProductsByNameComponent;
   let fixture: ComponentFixture<ListProductsByNameComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let productServiceSpy: jasmine.SpyObj<ProductService>;
 
   beforeEach(async () => {
@@ -23,6 +27,8 @@ describe('ListProductsByNameComponent', () => {
 
     fixture = TestBed.createComponent(ListProductsByNameComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -81,5 +87,35 @@ describe('ListProductsByNameComponent', () => {
 
     expect(component.isProductNameAbsent).toBeFalse();
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('List Products by Name');
+  });
+
+  it('should render a single productName input and keep submit disabled until valid', () => {
+    const input = debugElement.query(By.css('#productName'));
+    expect(input).toBeTruthy();
+    expect(nativeElement.querySelector('#productName')).toBe(input.nativeElement);
+
+    const button = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(button.disabled).toBeTrue();
+
+    component.productNameForm.setValue({ productName: 'Mouse' });
+    fixture.detectChanges();
+    expect(button.disabled).toBeFalse();
+  });
+
+  it('should render a table row per product after a successful search', () => {
+    productServiceSpy.getProductsByName.and.returnValue(of(new HttpResponse({ body: MockProducts, status: 200 })));
+
+    component.productNameForm.setValue({ productName: 'Mouse' });
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(MockProducts.length);
+    expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockProducts[0].name);
   });
 });

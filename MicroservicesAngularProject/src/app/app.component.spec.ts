@@ -1,32 +1,46 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
 
 describe('AppComponent', () => {
+  let fixture: ComponentFixture<AppComponent>;
+  let component: AppComponent;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [AppComponent, NavigationComponent]
     }).compileComponents();
+
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(component).toBeTruthy();
   });
 
   it(`should have as title 'MicroservicesAngularProject'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('MicroservicesAngularProject');
+    expect(component.title).toEqual('MicroservicesAngularProject');
   });
 
   it('should render the navigation component', () => {
-    const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-navigation')).toBeTruthy();
+    const navigation = debugElement.query(By.css('app-navigation'));
+    expect(navigation).toBeTruthy();
+    expect(nativeElement.querySelector('app-navigation')).toBe(navigation.nativeElement);
+  });
+
+  it('should host a single navigation component', () => {
+    fixture.detectChanges();
+    const navigations = debugElement.queryAll(By.css('app-navigation'));
+    expect(navigations.length).toBe(1);
   });
 });

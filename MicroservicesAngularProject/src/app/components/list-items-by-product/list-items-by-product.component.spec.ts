@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockOrderItems } from 'src/app/mockdata/order-item.mock';
 describe('ListItemsByProductComponent', () => {
   let component: ListItemsByProductComponent;
   let fixture: ComponentFixture<ListItemsByProductComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let orderServiceSpy: jasmine.SpyObj<OrderService>;
 
   beforeEach(async () => {
@@ -23,6 +27,8 @@ describe('ListItemsByProductComponent', () => {
 
     fixture = TestBed.createComponent(ListItemsByProductComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -82,5 +88,35 @@ describe('ListItemsByProductComponent', () => {
 
     expect(component.isProductIdAbsent).toBeFalse();
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('List Items By Products');
+  });
+
+  it('should render a single productId input and keep submit disabled until valid', () => {
+    const input = debugElement.query(By.css('#productId'));
+    expect(input).toBeTruthy();
+    expect(nativeElement.querySelector('#productId')).toBe(input.nativeElement);
+
+    const button = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(button.disabled).toBeTrue();
+
+    component.productIdForm.setValue({ productId: 1 });
+    fixture.detectChanges();
+    expect(button.disabled).toBeFalse();
+  });
+
+  it('should render a table row per item after a successful search', () => {
+    orderServiceSpy.listItemsByProduct.and.returnValue(of(new HttpResponse({ body: MockOrderItems, status: 200 })));
+
+    component.productIdForm.setValue({ productId: 1 });
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(MockOrderItems.length);
+    expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockOrderItems[0].name);
   });
 });

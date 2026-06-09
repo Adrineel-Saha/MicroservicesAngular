@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockOrders } from 'src/app/mockdata/order.mock';
 describe('UpdateOrderComponent', () => {
   let component: UpdateOrderComponent;
   let fixture: ComponentFixture<UpdateOrderComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let orderServiceSpy: jasmine.SpyObj<OrderService>;
 
   const mockOrder = MockOrders[0];
@@ -25,6 +29,8 @@ describe('UpdateOrderComponent', () => {
 
     fixture = TestBed.createComponent(UpdateOrderComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -92,5 +98,35 @@ describe('UpdateOrderComponent', () => {
 
     expect(component.showForm).toBeFalse();
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('Update an existing Order');
+  });
+
+  it('should render the lookup input and keep the Update Order button disabled until valid', () => {
+    const input = debugElement.query(By.css('#orderId'));
+    expect(input).toBeTruthy();
+    expect(nativeElement.querySelector('#orderId')).toBe(input.nativeElement);
+
+    const button = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(button.textContent?.trim()).toBe('Update Order');
+    expect(button.disabled).toBeTrue();
+
+    component.orderIdForm.setValue({ orderId: mockOrder.id });
+    fixture.detectChanges();
+    expect(button.disabled).toBeFalse();
+  });
+
+  it('should populate the status input after a successful lookup', () => {
+    orderServiceSpy.getOrder.and.returnValue(of(new HttpResponse({ body: mockOrder, status: 200 })));
+
+    component.orderIdForm.setValue({ orderId: mockOrder.id });
+    component.onUpdate();
+    fixture.detectChanges();
+
+    const statusInput = debugElement.query(By.css('#status')).nativeElement as HTMLInputElement;
+    expect(statusInput.value).toBe(mockOrder.status);
   });
 });

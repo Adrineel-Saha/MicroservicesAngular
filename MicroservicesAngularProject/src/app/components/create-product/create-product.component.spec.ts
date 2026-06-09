@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockProducts } from 'src/app/mockdata/product.mock';
 describe('CreateProductComponent', () => {
   let component: CreateProductComponent;
   let fixture: ComponentFixture<CreateProductComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let productServiceSpy: jasmine.SpyObj<ProductService>;
 
   const mockProduct = MockProducts[0];
@@ -25,6 +29,8 @@ describe('CreateProductComponent', () => {
 
     fixture = TestBed.createComponent(CreateProductComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -74,5 +80,35 @@ describe('CreateProductComponent', () => {
     component.onSubmit();
 
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('Add a New Product');
+  });
+
+  it('should render the four product inputs', () => {
+    const inputs = debugElement.queryAll(By.css('input'));
+    expect(inputs.length).toBe(4);
+    expect(debugElement.query(By.css('#name'))).toBeTruthy();
+    expect(nativeElement.querySelector('#price')).toBeTruthy();
+  });
+
+  it('should keep the submit button disabled until the form is valid', () => {
+    const button = debugElement.query(By.css('button[type="submit"]'));
+    const buttonElement = button.nativeElement as HTMLButtonElement;
+    expect(buttonElement.textContent?.trim()).toBe('Submit');
+    expect(buttonElement.disabled).toBeTrue();
+
+    component.productForm.patchValue(mockProduct);
+    fixture.detectChanges();
+    expect(buttonElement.disabled).toBeFalse();
+  });
+
+  it('should show a validation message once the product name is touched and blank', () => {
+    component.productNameControl.markAsTouched();
+    fixture.detectChanges();
+    const texts = debugElement.queryAll(By.css('p')).map(p => (p.nativeElement as HTMLElement).textContent?.trim());
+    expect(texts).toContain('Product_Name cannot be blank');
   });
 });

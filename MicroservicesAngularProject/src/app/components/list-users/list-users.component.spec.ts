@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
@@ -9,6 +11,8 @@ import { MockUsers } from 'src/app/mockdata/user.mock';
 describe('ListUsersComponent', () => {
   let component: ListUsersComponent;
   let fixture: ComponentFixture<ListUsersComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let userServiceSpy: jasmine.SpyObj<UserService>;
 
   beforeEach(async () => {
@@ -22,6 +26,8 @@ describe('ListUsersComponent', () => {
 
     fixture = TestBed.createComponent(ListUsersComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
   });
 
   it('should create', () => {
@@ -38,8 +44,24 @@ describe('ListUsersComponent', () => {
 
   it('should render a table row for every user', () => {
     fixture.detectChanges();
-    const rows = (fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr');
+    const rows = debugElement.queryAll(By.css('tbody tr'));
     expect(rows.length).toBe(MockUsers.length);
+  });
+
+  it('should render each user name in a row cell', () => {
+    fixture.detectChanges();
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    rows.forEach((row, index) => {
+      const rowElement = row.nativeElement as HTMLElement;
+      expect(rowElement.textContent).toContain(MockUsers[index].userName);
+    });
+  });
+
+  it('should not render any data rows before users load', () => {
+    userServiceSpy.getAllUsers.and.returnValue(throwError(() => ({ status: 400 })));
+    fixture.detectChanges();
+    expect(debugElement.query(By.css('tbody tr'))).toBeNull();
+    expect(nativeElement.querySelector('tbody tr')).toBeNull();
   });
 
   it('should default to an empty array when the response body is null', () => {

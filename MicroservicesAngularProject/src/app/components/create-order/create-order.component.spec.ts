@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockOrders } from 'src/app/mockdata/order.mock';
 describe('CreateOrderComponent', () => {
   let component: CreateOrderComponent;
   let fixture: ComponentFixture<CreateOrderComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let orderServiceSpy: jasmine.SpyObj<OrderService>;
 
   const mockOrder = MockOrders[0];
@@ -25,6 +29,8 @@ describe('CreateOrderComponent', () => {
 
     fixture = TestBed.createComponent(CreateOrderComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -71,5 +77,35 @@ describe('CreateOrderComponent', () => {
     component.onSubmit();
 
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('Add a New Order');
+  });
+
+  it('should render the userId and status inputs', () => {
+    const inputs = debugElement.queryAll(By.css('input'));
+    expect(inputs.length).toBe(2);
+    expect(debugElement.query(By.css('#userId'))).toBeTruthy();
+    expect(nativeElement.querySelector('#status')).toBeTruthy();
+  });
+
+  it('should keep the submit button disabled until the form is valid', () => {
+    const button = debugElement.query(By.css('button[type="submit"]'));
+    const buttonElement = button.nativeElement as HTMLButtonElement;
+    expect(buttonElement.textContent?.trim()).toBe('Submit');
+    expect(buttonElement.disabled).toBeTrue();
+
+    component.orderForm.patchValue(mockOrder);
+    fixture.detectChanges();
+    expect(buttonElement.disabled).toBeFalse();
+  });
+
+  it('should show a validation message once userId is touched and blank', () => {
+    component.userIdControl.markAsTouched();
+    fixture.detectChanges();
+    const texts = debugElement.queryAll(By.css('p')).map(p => (p.nativeElement as HTMLElement).textContent?.trim());
+    expect(texts).toContain('User_Id cannot be blank');
   });
 });

@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -10,6 +12,8 @@ import { MockUsers } from 'src/app/mockdata/user.mock';
 describe('CreateUserComponent', () => {
   let component: CreateUserComponent;
   let fixture: ComponentFixture<CreateUserComponent>;
+  let debugElement: DebugElement;
+  let nativeElement: HTMLElement;
   let userServiceSpy: jasmine.SpyObj<UserService>;
 
   const mockUser = MockUsers[0];
@@ -25,6 +29,8 @@ describe('CreateUserComponent', () => {
 
     fixture = TestBed.createComponent(CreateUserComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
+    nativeElement = debugElement.nativeElement as HTMLElement;
     fixture.detectChanges();
   });
 
@@ -89,5 +95,36 @@ describe('CreateUserComponent', () => {
     component.onSubmit();
 
     expect(component.submitted).toBeFalse();
+  });
+
+  it('should render the heading via debugElement', () => {
+    const heading = debugElement.query(By.css('h3'));
+    expect((heading.nativeElement as HTMLElement).textContent).toContain('Add a New User');
+  });
+
+  it('should render the userName and email inputs', () => {
+    const inputs = debugElement.queryAll(By.css('input'));
+    expect(inputs.length).toBe(2);
+    expect(debugElement.query(By.css('#userName'))).toBeTruthy();
+    expect(nativeElement.querySelector('#email')).toBeTruthy();
+  });
+
+  it('should keep the submit button disabled until the form is valid', () => {
+    const button = debugElement.query(By.css('button[type="submit"]'));
+    const buttonElement = button.nativeElement as HTMLButtonElement;
+    expect(buttonElement.textContent?.trim()).toBe('Submit');
+    expect(buttonElement.disabled).toBeTrue();
+
+    component.userForm.patchValue(mockUser);
+    fixture.detectChanges();
+    expect(buttonElement.disabled).toBeFalse();
+  });
+
+  it('should show a validation message once userName is touched and blank', () => {
+    component.userNameControl.markAsTouched();
+    fixture.detectChanges();
+    const messages = debugElement.queryAll(By.css('p'));
+    const texts = messages.map(p => (p.nativeElement as HTMLElement).textContent?.trim());
+    expect(texts).toContain('User_Name cannot be blank');
   });
 });
