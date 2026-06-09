@@ -107,19 +107,13 @@ describe('ProductService', () => {
 
   it('should create a product and return 201 status (createProduct)', () => {
     const newProduct = {
-      name: 'New Product',
-      description: 'This is a new product',
-      price: 100,
-      stock: 50
+      name: 'New ' + MockProducts[0].name,
+      description: MockProducts[0].description,
+      price: MockProducts[0].price,
+      stock: MockProducts[0].stock
     };
 
-    const createdProduct = {
-      id: 6,
-      name: 'New Product',
-      description: 'This is a new product',
-      price: 100,
-      stock: 50
-    };
+    const createdProduct = { id: MockProducts.length + 1, ...newProduct };
 
     productService.createProduct(newProduct).subscribe(response => {
       expect(response.status).toBe(201);
@@ -192,13 +186,12 @@ describe('ProductService', () => {
   });
 
   it('should update a product and return 202 status (updateProduct)', () => {
-    const productId = 1;
     const updatedProduct = {
-      name: 'Updated Product',
-      description: 'This is an updated product',
-      price: 150,
-      stock: 75
+      ...MockProducts[0],
+      name: 'Updated ' + MockProducts[0].name,
+      price: MockProducts[0].price + 100
     };
+    const productId = updatedProduct.id;
 
     productService.updateProduct(productId, updatedProduct).subscribe(response => {
       expect(response.status).toBe(202);
@@ -240,10 +233,9 @@ describe('ProductService', () => {
   it('should handle 404 Not Found (updateProduct)', () => {
     const productId = 999;
     const updatedProduct = {
-      name: 'Updated Product',
-      description: 'This is an updated product',
-      price: 150,
-      stock: 75
+      ...MockProducts[0],
+      name: 'Updated ' + MockProducts[0].name,
+      price: MockProducts[0].price + 100
     };
 
     productService.updateProduct(productId, updatedProduct).subscribe({

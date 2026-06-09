@@ -75,4 +75,17 @@ describe('ListUsersComponent', () => {
     fixture.detectChanges();
     expect(component.users).toBeUndefined();
   });
+
+  it('completes the whole flow: loads users on init and renders the table', () => {
+    fixture.detectChanges();
+
+    expect(userServiceSpy.getAllUsers).toHaveBeenCalled();
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(MockUsers.length);
+    rows.forEach((row, index) => {
+      const rowElement = row.nativeElement as HTMLElement;
+      expect(rowElement.textContent).toContain(MockUsers[index].userName);
+      expect(rowElement.textContent).toContain(MockUsers[index].email);
+    });
+  });
 });

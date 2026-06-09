@@ -46,8 +46,6 @@ describe('DeleteUserComponent', () => {
   it('should reject a userId below 1', () => {
     component.userIdControl.setValue(0);
     expect(component.userIdControl.hasError('min')).toBeTrue();
-    component.userIdControl.setValue(mockUser.id);
-    expect(component.userIdControl.valid).toBeTrue();
   });
 
   it('should delete the user and capture the result on success', () => {
@@ -117,5 +115,40 @@ describe('DeleteUserComponent', () => {
 
     const result = debugElement.query(By.css('h4'));
     expect((result.nativeElement as HTMLElement).textContent).toContain(message);
+  });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive userId and clear it when valid', () => {
+    component.userIdControl.setValue(0);
+    component.userIdControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('User_Id should be positive');
+
+    component.userIdControl.setValue(mockUser.id);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('User_Id should be positive');
+  });
+
+  it('completes the whole delete-user flow: enter id, delete, and show the result', () => {
+    const message = 'User deleted with Id: ' + mockUser.id;
+    userServiceSpy.deleteUser.and.returnValue(of(new HttpResponse({ body: message, status: 200 })));
+
+    const idInput = debugElement.query(By.css('#userId')).nativeElement as HTMLInputElement;
+    idInput.value = String(mockUser.id);
+    idInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const submit = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(submit.disabled).toBeFalse();
+    submit.click();
+    fixture.detectChanges();
+
+    expect(userServiceSpy.deleteUser).toHaveBeenCalledWith(mockUser.id);
+    expect(component.submitted).toBeTrue();
+    const result = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(result.textContent).toContain(message);
+    expect((result.parentElement as HTMLElement).hidden).toBeFalse();
   });
 });

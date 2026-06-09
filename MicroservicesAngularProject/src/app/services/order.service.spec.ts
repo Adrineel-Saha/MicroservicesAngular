@@ -109,18 +109,11 @@ describe('OrderService', () => {
 
       it('should create an order and return 201 status (createOrder)', () => {
         const newOrder = {
-          userId: 1,
-          status: 'CREATED'
+          userId: MockOrders[0].userId,
+          status: MockOrders[0].status
         };
-      
-        const createdOrder = {
-          id: 6,
-          userId: 1,
-          status: 'CREATED',
-          createdAt: new Date('2026-02-06T10:00:00'),
-          userName: 'Alice',
-          email: 'alice@example.com'
-        };
+
+        const createdOrder = { ...MockOrders[0], id: MockOrders.length + 1 };
       
         orderService.createOrder(newOrder).subscribe(response => {
           expect(response.status).toBe(201);
@@ -201,17 +194,10 @@ describe('OrderService', () => {
       });
 
       it('should update order status and return 202 status (updateOrderStatus)', () => {
-        const orderId = 1;
-        const status = 'SHIPPED';
-      
-        const updatedOrder = {
-          id: 1,
-          userId: 1,
-          status: 'SHIPPED',
-          createdAt: new Date('2026-02-01T10:00:00'),
-          userName: 'Alice',
-          email: 'alice@example.com'
-        };
+        const newStatus = MockOrders[3].status; // a different valid status: SHIPPED
+        const updatedOrder = { ...MockOrders[0], status: newStatus };
+        const orderId = updatedOrder.id;
+        const status = updatedOrder.status;
       
         orderService.updateOrderStatus(orderId, status).subscribe(response => {
           expect(response.body).toEqual(updatedOrder);
@@ -382,20 +368,18 @@ describe('OrderService', () => {
   
       it('should create an order item and return 201 status (addItem)', () => {
         const newItem = {
-          productId: 101,
-          quantity: 2,
-          orderId: 5
+          productId: MockOrderItems[0].productId,
+          quantity: MockOrderItems[0].quantity,
+          orderId: MockOrderItems[0].orderId
         };
-      
+
         const createdItem = {
-          id: 1,
-          productId: 101,
-          quantity: 2,
-          price: 500,
-          orderId: 5,
-          name: 'Laptop',
-          description: 'Gaming Laptop',
-          stock: 10
+          ...newItem,
+          id: MockOrderItems.length + 1,
+          price: MockOrderItems[0].price,
+          name: 'New ' + MockOrderItems[0].name,
+          description: 'New ' + MockOrderItems[0].description,
+          stock: MockOrderItems[0].stock
         };
       
         orderService.addItem(newItem).subscribe(response => {
@@ -505,17 +489,12 @@ describe('OrderService', () => {
       });
 
       it('should update an order item and return 202 status (updateItem)', () => {
-        const itemId = 1;
-      
         const updatedItem = {
-          productId: 101,
-          quantity: 3,
-          orderId: 10,
-          name: 'Updated Item',
-          description: 'Updated description',
-          price: 600,
-          stock: 20
+          ...MockOrderItems[0],
+          quantity: MockOrderItems[0].quantity + 1,
+          name: 'Updated ' + MockOrderItems[0].name
         };
+        const itemId = updatedItem.id;
       
         orderService.updateItem(itemId, updatedItem).subscribe(response => {
           expect(response.body).toEqual(updatedItem);
@@ -564,12 +543,11 @@ describe('OrderService', () => {
 
       it('should handle 404 Not Found (updateItem)', () => {
         const itemId = 999;
-      
+
         const updatedItem = {
-          productId: 101,
-          quantity: 2,
-          orderId: 10,
-          name: 'Updated Item'
+          ...MockOrderItems[0],
+          quantity: MockOrderItems[0].quantity + 1,
+          name: 'Updated ' + MockOrderItems[0].name
         };
       
         const errorMessage = 'OrderItem not found with Id: ' + itemId;

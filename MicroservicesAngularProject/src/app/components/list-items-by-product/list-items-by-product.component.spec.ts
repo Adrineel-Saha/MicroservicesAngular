@@ -45,8 +45,27 @@ describe('ListItemsByProductComponent', () => {
   it('should reject a productId below 1', () => {
     component.productIdControl.setValue(0);
     expect(component.productIdControl.hasError('min')).toBeTrue();
-    component.productIdControl.setValue(1);
-    expect(component.productIdControl.valid).toBeTrue();
+  });
+
+  it('completes the whole search flow: enter a productId, submit, and render the results table', () => {
+    orderServiceSpy.listItemsByProduct.and.returnValue(of(new HttpResponse({ body: MockOrderItems, status: 200 })));
+
+    const searchProductId = MockOrderItems[0].productId;
+    const input = debugElement.query(By.css('#productId')).nativeElement as HTMLInputElement;
+    input.value = String(searchProductId);
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const submit = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(submit.disabled).toBeFalse();
+    submit.click();
+    fixture.detectChanges();
+
+    expect(orderServiceSpy.listItemsByProduct).toHaveBeenCalledWith(searchProductId);
+    expect(component.submitted).toBeTrue();
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(MockOrderItems.length);
+    expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockOrderItems[0].name);
   });
 
   it('should load items and set submitted=true on success', () => {
@@ -118,5 +137,19 @@ describe('ListItemsByProductComponent', () => {
     const rows = debugElement.queryAll(By.css('tbody tr'));
     expect(rows.length).toBe(MockOrderItems.length);
     expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockOrderItems[0].name);
+  });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive productId and clear it when valid', () => {
+    component.productIdControl.setValue(0);
+    component.productIdControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Product_Id should be positive');
+
+    component.productIdControl.setValue(1);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Product_Id should be positive');
   });
 });

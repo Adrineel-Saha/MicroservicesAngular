@@ -130,4 +130,73 @@ describe('UpdateUserComponent', () => {
     expect(userNameInput.value).toBe(mockUser.userName);
     expect(emailInput.value).toBe(mockUser.email);
   });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive lookup userId and clear it when valid', () => {
+    component.userIdControlOne.setValue(0);
+    component.userIdControlOne.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('User_Id should be positive');
+
+    component.userIdControlOne.setValue(mockUser.id);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('User_Id should be positive');
+  });
+
+  it('should render edit-form validation messages for invalid input after a lookup', () => {
+    userServiceSpy.getUser.and.returnValue(of(new HttpResponse({ body: mockUser, status: 200 })));
+    component.userIdForm.setValue({ userId: mockUser.id });
+    component.onUpdate();
+    fixture.detectChanges();
+
+    component.userNameControl.setValue('ab');
+    component.userNameControl.markAsTouched();
+    component.emailControl.setValue('not-an-email');
+    component.emailControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('User_Name must be atleast 3 characters long');
+    expect(shownMessages()).toContain('Please enter a valid email');
+
+    component.userNameControl.setValue(mockUser.userName);
+    component.emailControl.setValue(mockUser.email);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('User_Name must be atleast 3 characters long');
+    expect(shownMessages()).not.toContain('Please enter a valid email');
+  });
+
+  it('completes the whole update-user flow: look up, edit, submit, and show success', () => {
+    userServiceSpy.getUser.and.returnValue(of(new HttpResponse({ body: mockUser, status: 200 })));
+    userServiceSpy.updateUser.and.returnValue(of(new HttpResponse({ body: mockUser, status: 202 })));
+
+    // Step 1 - enter the id and look the user up
+    const idInput = debugElement.query(By.css('#userId')).nativeElement as HTMLInputElement;
+    idInput.value = String(mockUser.id);
+    idInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    (debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(userServiceSpy.getUser).toHaveBeenCalledWith(mockUser.id);
+
+    // Step 2 - the edit form is populated; change the name and submit
+    const newUserName = MockUsers[1].userName;
+    const userNameInput = debugElement.query(By.css('#userName')).nativeElement as HTMLInputElement;
+    expect(userNameInput.value).toBe(mockUser.userName);
+    userNameInput.value = newUserName;
+    userNameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const buttons = debugElement.queryAll(By.css('button[type="submit"]'));
+    (buttons[buttons.length - 1].nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(userServiceSpy.updateUser).toHaveBeenCalledWith(
+      mockUser.id,
+      jasmine.objectContaining({ id: mockUser.id, userName: newUserName, email: mockUser.email })
+    );
+    expect(component.submitted).toBeTrue();
+    const success = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(success.textContent).toContain('User updated successfully!');
+  });
 });

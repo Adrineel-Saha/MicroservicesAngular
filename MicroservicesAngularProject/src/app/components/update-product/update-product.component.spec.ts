@@ -122,4 +122,73 @@ describe('UpdateProductComponent', () => {
     const nameInput = debugElement.query(By.css('#name')).nativeElement as HTMLInputElement;
     expect(nameInput.value).toBe(mockProduct.name);
   });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive lookup productId and clear it when valid', () => {
+    component.productIdControlOne.setValue(0);
+    component.productIdControlOne.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Product_Id should be positive');
+
+    component.productIdControlOne.setValue(mockProduct.id);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Product_Id should be positive');
+  });
+
+  it('should render edit-form validation messages for invalid input after a lookup', () => {
+    productServiceSpy.getProduct.and.returnValue(of(new HttpResponse({ body: mockProduct, status: 200 })));
+    component.productIdForm.setValue({ productId: mockProduct.id });
+    component.onUpdate();
+    fixture.detectChanges();
+
+    component.productNameControl.setValue('');
+    component.productNameControl.markAsTouched();
+    component.priceControl.setValue(0);
+    component.priceControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Product_Name cannot be blank');
+    expect(shownMessages()).toContain('Price should be positive');
+
+    component.productNameControl.setValue(mockProduct.name);
+    component.priceControl.setValue(mockProduct.price);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Product_Name cannot be blank');
+    expect(shownMessages()).not.toContain('Price should be positive');
+  });
+
+  it('completes the whole update-product flow: look up, edit, submit, and show success', () => {
+    productServiceSpy.getProduct.and.returnValue(of(new HttpResponse({ body: mockProduct, status: 200 })));
+    productServiceSpy.updateProduct.and.returnValue(of(new HttpResponse({ body: mockProduct, status: 202 })));
+
+    // Step 1 - enter the id and look the product up
+    const idInput = debugElement.query(By.css('#productId')).nativeElement as HTMLInputElement;
+    idInput.value = String(mockProduct.id);
+    idInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    (debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(productServiceSpy.getProduct).toHaveBeenCalledWith(mockProduct.id);
+
+    // Step 2 - the edit form is populated; change the name and submit
+    const newName = MockProducts[1].name;
+    const nameInput = debugElement.query(By.css('#name')).nativeElement as HTMLInputElement;
+    expect(nameInput.value).toBe(mockProduct.name);
+    nameInput.value = newName;
+    nameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const buttons = debugElement.queryAll(By.css('button[type="submit"]'));
+    (buttons[buttons.length - 1].nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(productServiceSpy.updateProduct).toHaveBeenCalledWith(
+      mockProduct.id,
+      jasmine.objectContaining({ id: mockProduct.id, name: newName })
+    );
+    expect(component.submitted).toBeTrue();
+    const success = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(success.textContent).toContain('Product updated successfully!');
+  });
 });

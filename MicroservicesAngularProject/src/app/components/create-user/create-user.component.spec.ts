@@ -49,18 +49,14 @@ describe('CreateUserComponent', () => {
     expect(component.userForm.valid).toBeFalse();
   });
 
-  it('should require userName to be at least 3 characters', () => {
+  it('should reject a userName shorter than 3 characters', () => {
     component.userNameControl.setValue('ab');
-    expect(component.userNameControl.valid).toBeFalse();
-    component.userNameControl.setValue(mockUser.userName);
-    expect(component.userNameControl.hasError('minlength')).toBeFalse();
+    expect(component.userNameControl.hasError('minlength')).toBeTrue();
   });
 
   it('should reject an invalid email pattern', () => {
     component.emailControl.setValue('not-an-email');
     expect(component.emailControl.hasError('pattern')).toBeTrue();
-    component.emailControl.setValue(mockUser.email);
-    expect(component.emailControl.valid).toBeTrue();
   });
 
   it('should be valid with proper values', () => {
@@ -120,11 +116,64 @@ describe('CreateUserComponent', () => {
     expect(buttonElement.disabled).toBeFalse();
   });
 
-  it('should show a validation message once userName is touched and blank', () => {
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the minlength message for a too-short userName and clear it when valid', () => {
+    component.userNameControl.setValue('ab');
     component.userNameControl.markAsTouched();
     fixture.detectChanges();
-    const messages = debugElement.queryAll(By.css('p'));
-    const texts = messages.map(p => (p.nativeElement as HTMLElement).textContent?.trim());
-    expect(texts).toContain('User_Name cannot be blank');
+    expect(shownMessages()).toContain('User_Name must be atleast 3 characters long');
+
+    component.userNameControl.setValue(mockUser.userName);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('User_Name must be atleast 3 characters long');
+  });
+
+  it('should render the pattern message for an invalid email and clear it when valid', () => {
+    component.emailControl.setValue('not-an-email');
+    component.emailControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Please enter a valid email');
+
+    component.emailControl.setValue(mockUser.email);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Please enter a valid email');
+  });
+
+  it('should render the required message when userName is blank and clear it when filled', () => {
+    component.userNameControl.setValue('');
+    component.userNameControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('User_Name cannot be blank');
+
+    component.userNameControl.setValue(mockUser.userName);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('User_Name cannot be blank');
+  });
+
+  it('completes the whole create-user flow: fill the form, submit, and show success', () => {
+    userServiceSpy.createUser.and.returnValue(of(new HttpResponse({ body: mockUser, status: 201 })));
+
+    const userNameInput = debugElement.query(By.css('#userName')).nativeElement as HTMLInputElement;
+    const emailInput = debugElement.query(By.css('#email')).nativeElement as HTMLInputElement;
+    userNameInput.value = mockUser.userName;
+    userNameInput.dispatchEvent(new Event('input'));
+    emailInput.value = mockUser.email;
+    emailInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const submit = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(submit.disabled).toBeFalse();
+    submit.click();
+    fixture.detectChanges();
+
+    expect(userServiceSpy.createUser).toHaveBeenCalledWith(
+      jasmine.objectContaining({ userName: mockUser.userName, email: mockUser.email })
+    );
+    expect(component.submitted).toBeTrue();
+    const success = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(success.textContent).toContain('User Added Successfully!');
+    expect((success.parentElement as HTMLElement).hidden).toBeFalse();
   });
 });

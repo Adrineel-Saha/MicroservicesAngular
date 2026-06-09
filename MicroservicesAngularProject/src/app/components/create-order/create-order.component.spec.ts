@@ -48,11 +48,9 @@ describe('CreateOrderComponent', () => {
     expect(component.userIdControl.hasError('min')).toBeTrue();
   });
 
-  it('should only accept a valid status value', () => {
+  it('should reject an invalid status value', () => {
     component.statusControl.setValue('UNKNOWN');
     expect(component.statusControl.hasError('pattern')).toBeTrue();
-    component.statusControl.setValue(mockOrder.status);
-    expect(component.statusControl.valid).toBeTrue();
   });
 
   it('should be valid with proper values', () => {
@@ -102,10 +100,53 @@ describe('CreateOrderComponent', () => {
     expect(buttonElement.disabled).toBeFalse();
   });
 
-  it('should show a validation message once userId is touched and blank', () => {
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive userId and clear it when valid', () => {
+    component.userIdControl.setValue(0);
     component.userIdControl.markAsTouched();
     fixture.detectChanges();
-    const texts = debugElement.queryAll(By.css('p')).map(p => (p.nativeElement as HTMLElement).textContent?.trim());
-    expect(texts).toContain('User_Id cannot be blank');
+    expect(shownMessages()).toContain('User_Id must be a positive number');
+
+    component.userIdControl.setValue(mockOrder.userId);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('User_Id must be a positive number');
+  });
+
+  it('should render the pattern message for an invalid status and clear it when valid', () => {
+    component.statusControl.setValue('UNKNOWN');
+    component.statusControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Status must be one of: CREATED, PAID, SHIPPED, CANCELLED');
+
+    component.statusControl.setValue(mockOrder.status);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Status must be one of: CREATED, PAID, SHIPPED, CANCELLED');
+  });
+
+  it('completes the whole create-order flow: fill the form, submit, and show success', () => {
+    orderServiceSpy.createOrder.and.returnValue(of(new HttpResponse({ body: mockOrder, status: 201 })));
+
+    const userIdInput = debugElement.query(By.css('#userId')).nativeElement as HTMLInputElement;
+    const statusInput = debugElement.query(By.css('#status')).nativeElement as HTMLInputElement;
+    userIdInput.value = String(mockOrder.userId);
+    userIdInput.dispatchEvent(new Event('input'));
+    statusInput.value = mockOrder.status;
+    statusInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const submit = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(submit.disabled).toBeFalse();
+    submit.click();
+    fixture.detectChanges();
+
+    expect(orderServiceSpy.createOrder).toHaveBeenCalledWith(
+      jasmine.objectContaining({ userId: mockOrder.userId, status: mockOrder.status })
+    );
+    expect(component.submitted).toBeTrue();
+    const success = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(success.textContent).toContain('Order Created Successfully!');
+    expect((success.parentElement as HTMLElement).hidden).toBeFalse();
   });
 });

@@ -50,8 +50,6 @@ describe('UpdateOrderComponent', () => {
   it('should reject an invalid status value', () => {
     component.statusControl.setValue('BOGUS');
     expect(component.statusControl.hasError('pattern')).toBeTrue();
-    component.statusControl.setValue(mockOrder.status);
-    expect(component.statusControl.valid).toBeTrue();
   });
 
   it('onUpdate should fetch the order and patch the form', () => {
@@ -128,5 +126,66 @@ describe('UpdateOrderComponent', () => {
 
     const statusInput = debugElement.query(By.css('#status')).nativeElement as HTMLInputElement;
     expect(statusInput.value).toBe(mockOrder.status);
+  });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive lookup orderId and clear it when valid', () => {
+    component.orderIdControlOne.setValue(0);
+    component.orderIdControlOne.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Order_Id should be positive');
+
+    component.orderIdControlOne.setValue(mockOrder.id);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Order_Id should be positive');
+  });
+
+  it('should render the pattern message for an invalid status after a lookup and clear it when valid', () => {
+    orderServiceSpy.getOrder.and.returnValue(of(new HttpResponse({ body: mockOrder, status: 200 })));
+    component.orderIdForm.setValue({ orderId: mockOrder.id });
+    component.onUpdate();
+    fixture.detectChanges();
+
+    component.statusControl.setValue('BOGUS');
+    component.statusControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Status must be one of: CREATED, PAID, SHIPPED, CANCELLED');
+
+    component.statusControl.setValue(mockOrder.status);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Status must be one of: CREATED, PAID, SHIPPED, CANCELLED');
+  });
+
+  it('completes the whole update-order flow: look up, change status, submit, and show success', () => {
+    orderServiceSpy.getOrder.and.returnValue(of(new HttpResponse({ body: mockOrder, status: 200 })));
+    orderServiceSpy.updateOrderStatus.and.returnValue(of(new HttpResponse({ body: mockOrder, status: 202 })));
+
+    // Step 1 - enter the id and look the order up
+    const idInput = debugElement.query(By.css('#orderId')).nativeElement as HTMLInputElement;
+    idInput.value = String(mockOrder.id);
+    idInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    (debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(orderServiceSpy.getOrder).toHaveBeenCalledWith(mockOrder.id);
+
+    // Step 2 - the form is populated; change the status and submit
+    const newStatus = MockOrders[2].status;
+    const statusInput = debugElement.query(By.css('#status')).nativeElement as HTMLInputElement;
+    expect(statusInput.value).toBe(mockOrder.status);
+    statusInput.value = newStatus;
+    statusInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const buttons = debugElement.queryAll(By.css('button[type="submit"]'));
+    (buttons[buttons.length - 1].nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(orderServiceSpy.updateOrderStatus).toHaveBeenCalledWith(mockOrder.id, newStatus);
+    expect(component.submitted).toBeTrue();
+    const success = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(success.textContent).toContain('Order updated successfully!');
   });
 });

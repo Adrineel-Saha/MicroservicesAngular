@@ -125,4 +125,73 @@ describe('UpdateOrderItemComponent', () => {
     expect(productIdInput.value).toBe(String(mockItem.productId));
     expect(quantityInput.value).toBe(String(mockItem.quantity));
   });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive lookup itemId and clear it when valid', () => {
+    component.itemIdControlOne.setValue(0);
+    component.itemIdControlOne.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Item_Id should be positive');
+
+    component.itemIdControlOne.setValue(mockItem.id);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Item_Id should be positive');
+  });
+
+  it('should render edit-form validation messages for invalid input after a lookup', () => {
+    orderServiceSpy.getItem.and.returnValue(of(new HttpResponse({ body: mockItem, status: 200 })));
+    component.itemIdForm.setValue({ itemId: mockItem.id });
+    component.onUpdate();
+    fixture.detectChanges();
+
+    component.productIdControl.setValue(0);
+    component.productIdControl.markAsTouched();
+    component.quantityControl.setValue(0);
+    component.quantityControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Product_Id must be a positive number');
+    expect(shownMessages()).toContain('Quantity must be at least 1');
+
+    component.productIdControl.setValue(mockItem.productId);
+    component.quantityControl.setValue(mockItem.quantity);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Product_Id must be a positive number');
+    expect(shownMessages()).not.toContain('Quantity must be at least 1');
+  });
+
+  it('completes the whole update-order-item flow: look up, edit, submit, and show success', () => {
+    orderServiceSpy.getItem.and.returnValue(of(new HttpResponse({ body: mockItem, status: 200 })));
+    orderServiceSpy.updateItem.and.returnValue(of(new HttpResponse({ body: mockItem, status: 202 })));
+
+    // Step 1 - enter the id and look the item up
+    const idInput = debugElement.query(By.css('#itemId')).nativeElement as HTMLInputElement;
+    idInput.value = String(mockItem.id);
+    idInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    (debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(orderServiceSpy.getItem).toHaveBeenCalledWith(mockItem.id);
+
+    // Step 2 - the form is populated; change the quantity and submit
+    const newQuantity = MockOrderItems[2].quantity;
+    const quantityInput = debugElement.query(By.css('#quantity')).nativeElement as HTMLInputElement;
+    expect(quantityInput.value).toBe(String(mockItem.quantity));
+    quantityInput.value = String(newQuantity);
+    quantityInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const buttons = debugElement.queryAll(By.css('button[type="submit"]'));
+    (buttons[buttons.length - 1].nativeElement as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(orderServiceSpy.updateItem).toHaveBeenCalledWith(
+      mockItem.id,
+      jasmine.objectContaining({ id: mockItem.id, quantity: newQuantity })
+    );
+    expect(component.submitted).toBeTrue();
+    const success = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(success.textContent).toContain('Order Item updated successfully!');
+  });
 });

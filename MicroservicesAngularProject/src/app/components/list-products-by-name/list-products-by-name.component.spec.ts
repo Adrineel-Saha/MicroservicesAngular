@@ -44,8 +44,27 @@ describe('ListProductsByNameComponent', () => {
 
   it('should require a product name', () => {
     expect(component.productNameControl.hasError('required')).toBeTrue();
-    component.productNameControl.setValue('Mouse');
-    expect(component.productNameControl.valid).toBeTrue();
+  });
+
+  it('completes the whole search flow: enter a name, submit, and render the results table', () => {
+    productServiceSpy.getProductsByName.and.returnValue(of(new HttpResponse({ body: MockProducts, status: 200 })));
+
+    const searchName = MockProducts[0].name;
+    const input = debugElement.query(By.css('#productName')).nativeElement as HTMLInputElement;
+    input.value = searchName;
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const submit = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(submit.disabled).toBeFalse();
+    submit.click();
+    fixture.detectChanges();
+
+    expect(productServiceSpy.getProductsByName).toHaveBeenCalledWith(searchName);
+    expect(component.submitted).toBeTrue();
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(MockProducts.length);
+    expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockProducts[0].name);
   });
 
   it('should load products and set submitted=true on success', () => {
@@ -117,5 +136,19 @@ describe('ListProductsByNameComponent', () => {
     const rows = debugElement.queryAll(By.css('tbody tr'));
     expect(rows.length).toBe(MockProducts.length);
     expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockProducts[0].name);
+  });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the required message when the product name is blank and clear it when filled', () => {
+    component.productNameControl.setValue('');
+    component.productNameControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Product_Name cannot be blank');
+
+    component.productNameControl.setValue('Mouse');
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Product_Name cannot be blank');
   });
 });

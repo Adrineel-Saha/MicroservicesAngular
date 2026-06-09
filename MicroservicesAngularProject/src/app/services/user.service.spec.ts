@@ -107,15 +107,11 @@ describe('UserService', () => {
 
   it('should create a user and return 201 status (createUser)', () => {
     const newUser = {
-      userName: 'New User',
-      email: 'new@example.com'
+      userName: 'New ' + MockUsers[0].userName,
+      email: 'new.' + MockUsers[0].email
     };
 
-    const createdUser = {
-      id: 6,
-      userName: 'New User',
-      email: 'new@example.com'
-    };
+    const createdUser = { id: MockUsers.length + 1, ...newUser };
   
     userService.createUser(newUser).subscribe(response => {
       expect(response.status).toBe(201);
@@ -151,11 +147,12 @@ describe('UserService', () => {
   });
 
   it('should update a user and return 202 status (updateUser)', () => {
-    const userId = 1;
     const updatedUser = {
-      userName: 'Updated User',
-      email: 'updated@example.com'
+      ...MockUsers[0],
+      userName: 'Updated ' + MockUsers[0].userName,
+      email: 'updated.' + MockUsers[0].email
     };
+    const userId = updatedUser.id;
 
     userService.updateUser(userId, updatedUser).subscribe(response => {
       expect(response.status).toBe(202);
@@ -195,8 +192,9 @@ describe('UserService', () => {
   it('should handle 404 Not Found (updateUser)', () => {
     const userId = 999;
     const updatedUser = {
-      userName: 'Updated User',
-      email: 'updated@example.com'
+      ...MockUsers[0],
+      userName: 'Updated ' + MockUsers[0].userName,
+      email: 'updated.' + MockUsers[0].email
     };
 
     userService.updateUser(userId, updatedUser).subscribe({

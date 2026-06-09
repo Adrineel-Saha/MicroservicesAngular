@@ -46,8 +46,6 @@ describe('CreateOrderItemComponent', () => {
   it('should reject a quantity below 1', () => {
     component.quantityControl.setValue(0);
     expect(component.quantityControl.hasError('min')).toBeTrue();
-    component.quantityControl.setValue(mockItem.quantity);
-    expect(component.quantityControl.valid).toBeTrue();
   });
 
   it('should be valid with proper values', () => {
@@ -97,10 +95,56 @@ describe('CreateOrderItemComponent', () => {
     expect(buttonElement.disabled).toBeFalse();
   });
 
-  it('should show a validation message once productId is touched and blank', () => {
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive productId and clear it when valid', () => {
+    component.productIdControl.setValue(0);
     component.productIdControl.markAsTouched();
     fixture.detectChanges();
-    const texts = debugElement.queryAll(By.css('p')).map(p => (p.nativeElement as HTMLElement).textContent?.trim());
-    expect(texts).toContain('Product_Id cannot be blank');
+    expect(shownMessages()).toContain('Product_Id must be a positive number');
+
+    component.productIdControl.setValue(mockItem.productId);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Product_Id must be a positive number');
+  });
+
+  it('should render the min message for a quantity below 1 and clear it when valid', () => {
+    component.quantityControl.setValue(0);
+    component.quantityControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('Quantity must be at least 1');
+
+    component.quantityControl.setValue(mockItem.quantity);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('Quantity must be at least 1');
+  });
+
+  it('completes the whole create-order-item flow: fill the form, submit, and show success', () => {
+    orderServiceSpy.addItem.and.returnValue(of(new HttpResponse({ body: mockItem, status: 201 })));
+
+    const productIdInput = debugElement.query(By.css('#productId')).nativeElement as HTMLInputElement;
+    const quantityInput = debugElement.query(By.css('#quantity')).nativeElement as HTMLInputElement;
+    const orderIdInput = debugElement.query(By.css('#orderId')).nativeElement as HTMLInputElement;
+    productIdInput.value = String(mockItem.productId);
+    productIdInput.dispatchEvent(new Event('input'));
+    quantityInput.value = String(mockItem.quantity);
+    quantityInput.dispatchEvent(new Event('input'));
+    orderIdInput.value = String(mockItem.orderId);
+    orderIdInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const submit = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(submit.disabled).toBeFalse();
+    submit.click();
+    fixture.detectChanges();
+
+    expect(orderServiceSpy.addItem).toHaveBeenCalledWith(
+      jasmine.objectContaining({ productId: mockItem.productId, quantity: mockItem.quantity, orderId: mockItem.orderId })
+    );
+    expect(component.submitted).toBeTrue();
+    const success = debugElement.query(By.css('h4')).nativeElement as HTMLElement;
+    expect(success.textContent).toContain('Order Item Created Successfully!');
+    expect((success.parentElement as HTMLElement).hidden).toBeFalse();
   });
 });

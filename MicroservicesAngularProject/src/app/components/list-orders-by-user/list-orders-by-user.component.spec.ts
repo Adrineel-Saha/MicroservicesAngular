@@ -45,8 +45,27 @@ describe('ListOrdersByUserComponent', () => {
   it('should reject a userId below 1', () => {
     component.userIdControl.setValue(0);
     expect(component.userIdControl.hasError('min')).toBeTrue();
-    component.userIdControl.setValue(1);
-    expect(component.userIdControl.valid).toBeTrue();
+  });
+
+  it('completes the whole search flow: enter a userId, submit, and render the results table', () => {
+    orderServiceSpy.listOrdersByUser.and.returnValue(of(new HttpResponse({ body: MockOrders, status: 200 })));
+
+    const searchUserId = MockOrders[0].userId;
+    const input = debugElement.query(By.css('#userId')).nativeElement as HTMLInputElement;
+    input.value = String(searchUserId);
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const submit = debugElement.query(By.css('button[type="submit"]')).nativeElement as HTMLButtonElement;
+    expect(submit.disabled).toBeFalse();
+    submit.click();
+    fixture.detectChanges();
+
+    expect(orderServiceSpy.listOrdersByUser).toHaveBeenCalledWith(searchUserId);
+    expect(component.submitted).toBeTrue();
+    const rows = debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(MockOrders.length);
+    expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockOrders[0].status);
   });
 
   it('should load orders and set submitted=true on success', () => {
@@ -118,5 +137,19 @@ describe('ListOrdersByUserComponent', () => {
     const rows = debugElement.queryAll(By.css('tbody tr'));
     expect(rows.length).toBe(MockOrders.length);
     expect((rows[0].nativeElement as HTMLElement).textContent).toContain(MockOrders[0].status);
+  });
+
+  const shownMessages = (): string[] =>
+    debugElement.queryAll(By.css('p')).map(p => ((p.nativeElement as HTMLElement).textContent ?? '').trim());
+
+  it('should render the min message for a non-positive userId and clear it when valid', () => {
+    component.userIdControl.setValue(0);
+    component.userIdControl.markAsTouched();
+    fixture.detectChanges();
+    expect(shownMessages()).toContain('User_Id should be positive');
+
+    component.userIdControl.setValue(1);
+    fixture.detectChanges();
+    expect(shownMessages()).not.toContain('User_Id should be positive');
   });
 });
