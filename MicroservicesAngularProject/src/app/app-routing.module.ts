@@ -13,21 +13,29 @@ import { UpdateProductComponent } from './components/update-product/update-produ
 import { UpdateOrderComponent } from './components/update-order/update-order.component';
 import { UpdateOrderItemComponent } from './components/update-order-item/update-order-item.component';
 import { DeleteUserComponent } from './components/delete-user/delete-user.component';
+import { AuthGuardService } from './services/auth-guard.service';
+import { AuthGuardAdminService } from './services/auth-guard-admin.service';
+import { AuthGuardUserService } from './services/auth-guard-user.service';
 
 const routes: Routes = [
-  {path: 'createUser', component: CreateUserComponent},
-  {path: 'createProduct', component: CreateProductComponent},
-  {path: 'createOrder', component: CreateOrderComponent},
-  {path: 'createOrderItem', component: CreateOrderItemComponent},
-  {path: 'listUsers', component: ListUsersComponent},
-  {path: 'listProductsByName', component: ListProductsByNameComponent},
-  {path: 'listOrdersByUser', component: ListOrdersByUserComponent},
-  {path: 'listItemsByProduct', component: ListItemsByProductComponent},
-  {path: 'updateUser', component: UpdateUserComponent},
-  {path: 'updateProduct', component: UpdateProductComponent},
-  {path: 'updateOrder', component: UpdateOrderComponent},
-  {path: 'updateOrderItem', component: UpdateOrderItemComponent},
-  {path: 'deleteUser', component: DeleteUserComponent}
+  // ADMIN only — user management
+  {path: 'createUser', component: CreateUserComponent, canActivate: [AuthGuardAdminService]},
+  {path: 'listUsers', component: ListUsersComponent, canActivate: [AuthGuardAdminService]},
+  {path: 'updateUser', component: UpdateUserComponent, canActivate: [AuthGuardAdminService]},
+  {path: 'deleteUser', component: DeleteUserComponent, canActivate: [AuthGuardAdminService]},
+
+  // ADMIN, MODERATOR, USER only — order management (GUEST not allowed)
+  {path: 'createOrder', component: CreateOrderComponent, canActivate: [AuthGuardUserService]},
+  {path: 'createOrderItem', component: CreateOrderItemComponent, canActivate: [AuthGuardUserService]},
+  {path: 'listOrdersByUser', component: ListOrdersByUserComponent, canActivate: [AuthGuardUserService]},
+  {path: 'updateOrder', component: UpdateOrderComponent, canActivate: [AuthGuardUserService]},
+  {path: 'updateOrderItem', component: UpdateOrderItemComponent, canActivate: [AuthGuardUserService]},
+
+  // All logged-in users including GUEST — product management
+  {path: 'createProduct', component: CreateProductComponent, canActivate: [AuthGuardService]},
+  {path: 'listProductsByName', component: ListProductsByNameComponent, canActivate: [AuthGuardService]},
+  {path: 'listItemsByProduct', component: ListItemsByProductComponent, canActivate: [AuthGuardService]},
+  {path: 'updateProduct', component: UpdateProductComponent, canActivate: [AuthGuardService]}
 ];
 
 @NgModule({

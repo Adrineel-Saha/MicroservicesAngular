@@ -1,0 +1,107 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-header text-white text-center" style="background-color: rgba(7, 211, 0, 0.918);">
+          <h4><b>Create an Account</b></h4>
+        </div>
+        <div class="card-body p-4">
+          <form [formGroup]="signupForm" (ngSubmit)="checkSignup()">
+
+            <div class="mb-3">
+              <label for="username" class="form-label"><b>Username</b></label>
+              <input
+                id="username"
+                type="text"
+                class="form-control"
+                formControlName="username"
+                placeholder="Enter username"
+              />
+              <div *ngIf="usernameControl.touched && usernameControl.errors?.['required']" class="text-danger small mt-1">Username is required.</div>
+              <div *ngIf="usernameControl.touched && usernameControl.errors?.['minlength']" class="text-danger small mt-1">Username must be at least 3 characters.</div>
+              <div *ngIf="usernameControl.touched && usernameControl.errors?.['maxlength']" class="text-danger small mt-1">Username cannot exceed 50 characters.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label"><b>Email</b></label>
+              <input
+                id="email"
+                type="email"
+                class="form-control"
+                formControlName="email"
+                placeholder="Enter email"
+              />
+              <div *ngIf="emailControl.touched && emailControl.errors?.['required']" class="text-danger small mt-1">Email is required.</div>
+              <div *ngIf="emailControl.touched && emailControl.errors?.['email']" class="text-danger small mt-1">Enter a valid email address.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label"><b>Password</b></label>
+              <input
+                id="password"
+                type="password"
+                class="form-control"
+                formControlName="password"
+                placeholder="Enter password"
+              />
+              <div *ngIf="passwordControl.touched && passwordControl.errors?.['required']" class="text-danger small mt-1">Password is required.</div>
+              <div *ngIf="passwordControl.touched && passwordControl.errors?.['minlength']" class="text-danger small mt-1">Password must be at least 6 characters.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label"><b>Confirm Password</b></label>
+              <input
+                id="confirmPassword"
+                type="password"
+                class="form-control"
+                formControlName="confirmPassword"
+                placeholder="Re-enter password"
+              />
+              <div *ngIf="confirmPasswordControl.touched && confirmPasswordControl.errors?.['required']" class="text-danger small mt-1">Please confirm your password.</div>
+              <div *ngIf="confirmPasswordControl.touched && passwordMismatch" class="text-danger small mt-1">Passwords do not match.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="role" class="form-label"><b>Role</b></label>
+              <select
+                id="role"
+                class="form-select"
+                formControlName="role"
+              >
+                <option value="" disabled>Select a role</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="USER">USER</option>
+                <option value="MODERATOR">MODERATOR</option>
+                <option value="GUEST">GUEST</option>
+              </select>
+              <div *ngIf="roleControl.touched && roleControl.errors?.['required']" class="text-danger small mt-1">Please select a role.</div>
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger py-2">
+              {{ errorMessage }}
+            </div>
+
+            <div *ngIf="successMessage" class="alert alert-success py-2">
+              {{ successMessage }}
+            </div>
+
+            <button
+              type="submit"
+              class="btn w-100 text-white mb-3"
+              style="background-color: rgba(7, 211, 0, 0.918);"
+              [disabled]="signupForm.invalid"
+            >
+              <b>Sign Up</b>
+            </button>
+
+            <div class="text-center">
+              <span>Already have an account? </span>
+              <a href="#" (click)="$event.preventDefault(); goToLogin()" style="color: rgba(7, 211, 0, 0.918);"><b>Login</b></a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

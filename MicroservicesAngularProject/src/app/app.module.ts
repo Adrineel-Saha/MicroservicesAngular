@@ -9,7 +9,7 @@ import { CreateProductComponent } from './components/create-product/create-produ
 import { CreateUserComponent } from './components/create-user/create-user.component';
 import { CreateOrderComponent } from './components/create-order/create-order.component';
 import { CreateOrderItemComponent } from './components/create-order-item/create-order-item.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ListUsersComponent } from './components/list-users/list-users.component';
 import { ListProductsByNameComponent } from './components/list-products-by-name/list-products-by-name.component';
 import { ListOrdersByUserComponent } from './components/list-orders-by-user/list-orders-by-user.component';
@@ -19,12 +19,16 @@ import { UpdateProductComponent } from './components/update-product/update-produ
 import { UpdateOrderComponent } from './components/update-order/update-order.component';
 import { UpdateOrderItemComponent } from './components/update-order-item/update-order-item.component';
 import { DeleteUserComponent } from './components/delete-user/delete-user.component';
+import { LoginComponent } from './components/login/login.component';
+import { SignupComponent } from './components/signup/signup.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     NavigationComponent,
+    LoginComponent,
+    SignupComponent,
     CreateProductComponent,
     CreateUserComponent,
     CreateOrderComponent,
@@ -43,7 +47,8 @@ import { DeleteUserComponent } from './components/delete-user/delete-user.compon
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

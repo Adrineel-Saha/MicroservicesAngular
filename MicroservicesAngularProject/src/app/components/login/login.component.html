@@ -1,0 +1,61 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-header text-white text-center" style="background-color: rgba(7, 211, 0, 0.918);">
+          <h4><b>Microservices Portal Login</b></h4>
+        </div>
+        <div class="card-body p-4">
+          <form [formGroup]="loginForm" (ngSubmit)="checkLogin()">
+
+            <div class="mb-3">
+              <label for="username" class="form-label"><b>Username</b></label>
+              <input
+                id="username"
+                type="text"
+                class="form-control"
+                formControlName="username"
+                placeholder="Enter username"
+              />
+              <div *ngIf="usernameControl.touched && usernameControl.errors?.['required']" class="text-danger small mt-1">Username is required.</div>
+              <div *ngIf="usernameControl.touched && usernameControl.errors?.['minlength']" class="text-danger small mt-1">Username must be at least 3 characters.</div>
+              <div *ngIf="usernameControl.touched && usernameControl.errors?.['maxlength']" class="text-danger small mt-1">Username cannot exceed 50 characters.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label"><b>Password</b></label>
+              <input
+                id="password"
+                type="password"
+                class="form-control"
+                formControlName="password"
+                placeholder="Enter password"
+              />
+              <div *ngIf="passwordControl.touched && passwordControl.errors?.['required']" class="text-danger small mt-1">Password is required.</div>
+              <div *ngIf="passwordControl.touched && passwordControl.errors?.['minlength']" class="text-danger small mt-1">Password must be at least 6 characters.</div>
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger py-2">
+              {{ errorMessage }}
+            </div>
+
+            <button
+              type="submit"
+              class="btn w-100 text-white mb-3"
+              style="background-color: rgba(7, 211, 0, 0.918);"
+              [disabled]="loginForm.invalid"
+            >
+              <b>Login</b>
+            </button>
+
+            <div class="text-center">
+              <span>Don't have an account? </span>
+              <a href="#" (click)="$event.preventDefault(); goToSignup()" style="color: rgba(7, 211, 0, 0.918);"><b>Sign Up</b></a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

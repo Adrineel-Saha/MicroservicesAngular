@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+﻿import { Component, HostListener } from '@angular/core';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,16 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'MicroservicesAngularProject';
+
+  constructor(public authService: AuthService) {}
+
+  title="MicroservicesAngularProject"
+
+  @HostListener('document:mousemove')
+  @HostListener('document:keydown')
+  @HostListener('document:click')
+  onUserActivity(): void {
+    this.authService.resetInactivityTimer();
+  }
 }
+

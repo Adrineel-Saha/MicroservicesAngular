@@ -1,3 +1,12 @@
-<h1>{{title}}</h1>
-<app-navigation></app-navigation>
-<router-outlet></router-outlet>
+<ng-container *ngIf="authService.isLoggedIn(); else authViews">
+  <h1>{{title}}</h1>
+  <app-navigation></app-navigation>
+  <router-outlet></router-outlet>
+</ng-container>
+
+<ng-template #authViews>
+  <app-signup *ngIf="authService.showSignup; else loginView"></app-signup>
+  <ng-template #loginView>
+    <app-login></app-login>
+  </ng-template>
+</ng-template>
