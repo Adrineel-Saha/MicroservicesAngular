@@ -22,6 +22,7 @@ import { UpdateOrderItemComponent } from './components/update-order-item/update-
 import { DeleteUserComponent } from './components/delete-user/delete-user.component';
 import { LoginComponent } from './components/login/login.component';
 import { SignupComponent } from './components/signup/signup.component';
+import { LogoutComponent } from './components/logout/logout.component';
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import { SignupComponent } from './components/signup/signup.component';
     NavigationComponent,
     LoginComponent,
     SignupComponent,
+    LogoutComponent,
     CreateProductComponent,
     CreateUserComponent,
     CreateOrderComponent,

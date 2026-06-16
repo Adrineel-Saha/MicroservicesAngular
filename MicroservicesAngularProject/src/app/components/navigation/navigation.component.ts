@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navigation',
@@ -9,10 +8,19 @@ import { Router } from '@angular/router';
 })
 export class NavigationComponent {
 
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(public authService: AuthService) {}
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
+  checkAdmin(event: MouseEvent): void {
+    if (!this.authService.isAdmin()) {
+      event.preventDefault();
+      alert('Access denied. This section is for ADMIN users only.');
+    }
+  }
+
+  checkUserRole(event: MouseEvent): void {
+    if (!this.authService.isUserRole()) {
+      event.preventDefault();
+      alert('Access denied. GUEST users are not allowed to access Order Management.');
+    }
   }
 }

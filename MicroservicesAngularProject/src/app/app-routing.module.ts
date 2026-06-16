@@ -16,8 +16,10 @@ import { DeleteUserComponent } from './components/delete-user/delete-user.compon
 import { AuthGuardService } from './services/auth-guard.service';
 import { AuthGuardAdminService } from './services/auth-guard-admin.service';
 import { AuthGuardUserService } from './services/auth-guard-user.service';
+import { LogoutComponent } from './components/logout/logout.component';
 
 const routes: Routes = [
+  { path: 'logout', component: LogoutComponent, canActivate: [AuthGuardService] },
   // ADMIN only — user management
   {path: 'createUser', component: CreateUserComponent, canActivate: [AuthGuardAdminService]},
   {path: 'listUsers', component: ListUsersComponent, canActivate: [AuthGuardAdminService]},

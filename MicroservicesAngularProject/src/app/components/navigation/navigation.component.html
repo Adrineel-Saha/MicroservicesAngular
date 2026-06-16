@@ -4,16 +4,16 @@
 
       <!-- User Management (ADMIN only) -->
       <li class="nav-item">
-        <a class="nav-link" routerLink="/createUser"><b>Add New User</b></a>
+        <a class="nav-link" style="cursor:pointer;" routerLink="/createUser" (click)="checkAdmin($event)"><b>Add New User</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/listUsers"><b>View all Users</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/listUsers" (click)="checkAdmin($event)"><b>View all Users</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/updateUser"><b>Update Existing User</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/updateUser" (click)="checkAdmin($event)"><b>Update Existing User</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/deleteUser"><b>Delete Existing User</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/deleteUser" (click)="checkAdmin($event)"><b>Delete Existing User</b></a>
       </li>
 
       <!-- Product Management (all logged-in users) -->
@@ -32,23 +32,23 @@
 
       <!-- Order Management (ADMIN, MODERATOR, USER only) -->
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/createOrder"><b>Add New Order</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/createOrder" (click)="checkUserRole($event)"><b>Add New Order</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/createOrderItem"><b>Add New Order Item</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/createOrderItem" (click)="checkUserRole($event)"><b>Add New Order Item</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/listOrdersByUser"><b>View Orders By User</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/listOrdersByUser" (click)="checkUserRole($event)"><b>View Orders By User</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/updateOrder"><b>Update Existing Order</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/updateOrder" (click)="checkUserRole($event)"><b>Update Existing Order Status</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/updateOrderItem"><b>Update Existing Order Item</b></a>
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/updateOrderItem" (click)="checkUserRole($event)"><b>Update Existing Order Item</b></a>
       </li>
 
       <li class="nav-item">
-        <button class="btn btn-outline-light btn-sm my-auto mx-2" (click)="logout()"><b>Logout</b></button>
+        <a class="nav-link" style="margin-left:1rem;" routerLink="/logout"><b>Logout</b></a>
       </li>
 
     </ul>
