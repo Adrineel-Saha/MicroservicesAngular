@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { UserService } from './user.service';
 import { MockUsers } from '../mockdata/user.mock';
@@ -12,7 +13,7 @@ describe('UserService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule], 
+      imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [UserService]
     });
 
@@ -21,11 +22,42 @@ describe('UserService', () => {
   });
   
   afterEach(() => {
-    httpMock.verify(); 
+    httpMock.verify();
+    sessionStorage.clear();
   });
 
   it('should be created', () => {
     expect(userService).toBeTruthy();
+  });
+
+  it('should attach a Bearer Authorization header when a token is present', () => {
+    sessionStorage.setItem('auth_token', 'test-jwt');
+
+    userService.getAllUsers().subscribe();
+
+    const req = httpMock.expectOne(baseUrl);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-jwt');
+    req.flush(MockUsers);
+  });
+
+  it('should attach the Authorization header on write requests too (createUser)', () => {
+    sessionStorage.setItem('auth_token', 'test-jwt');
+    const newUser = { userName: 'New', email: 'new@example.com' };
+
+    userService.createUser(newUser).subscribe();
+
+    const req = httpMock.expectOne(baseUrl);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-jwt');
+    req.flush(newUser, { status: 201, statusText: 'Created' });
+  });
+
+  it('should not attach an Authorization header when no token is present', () => {
+    userService.getAllUsers().subscribe();
+
+    const req = httpMock.expectOne(baseUrl);
+    expect(req.request.headers.has('Authorization')).toBeFalse();
+    req.flush(MockUsers);
   });
 
   it('should return all users and return 200 status (getAllUsers)', () => {

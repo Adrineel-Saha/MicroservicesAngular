@@ -24,9 +24,6 @@
         <a class="nav-link" style="margin-left:1rem;" routerLink="/listProductsByName"><b>View Products By Name</b></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="margin-left:1rem;" routerLink="/listItemsByProduct"><b>View Items By Product</b></a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" style="margin-left:1rem;" routerLink="/updateProduct"><b>Update Existing Product</b></a>
       </li>
 
@@ -45,6 +42,9 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/updateOrderItem" (click)="checkUserRole($event)"><b>Update Existing Order Item</b></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="margin-left:1rem; cursor:pointer;" routerLink="/listItemsByProduct" (click)="checkUserRole($event)"><b>View Items By Product</b></a>
       </li>
 
       <li class="nav-item">

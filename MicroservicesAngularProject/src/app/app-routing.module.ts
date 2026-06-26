@@ -32,11 +32,12 @@ const routes: Routes = [
   {path: 'listOrdersByUser', component: ListOrdersByUserComponent, canActivate: [AuthGuardUserService]},
   {path: 'updateOrder', component: UpdateOrderComponent, canActivate: [AuthGuardUserService]},
   {path: 'updateOrderItem', component: UpdateOrderItemComponent, canActivate: [AuthGuardUserService]},
+  // Items-by-product reads from the order service (/api/orders/items), so it needs USER+ as well
+  {path: 'listItemsByProduct', component: ListItemsByProductComponent, canActivate: [AuthGuardUserService]},
 
   // All logged-in users including GUEST — product management
   {path: 'createProduct', component: CreateProductComponent, canActivate: [AuthGuardService]},
   {path: 'listProductsByName', component: ListProductsByNameComponent, canActivate: [AuthGuardService]},
-  {path: 'listItemsByProduct', component: ListItemsByProductComponent, canActivate: [AuthGuardService]},
   {path: 'updateProduct', component: UpdateProductComponent, canActivate: [AuthGuardService]}
 ];
 

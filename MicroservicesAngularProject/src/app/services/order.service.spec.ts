@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { OrderService } from './order.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { MockOrders } from '../mockdata/order.mock';
 import { MockOrderItems } from '../mockdata/order-item.mock';
 
@@ -14,7 +15,7 @@ describe('OrderService', () => {
   
   beforeEach(() => {
     TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule], 
+            imports: [HttpClientTestingModule, RouterTestingModule],
             providers: [OrderService]
           });
     
@@ -23,11 +24,40 @@ describe('OrderService', () => {
   });
 
   afterEach(() => {
-    httpMock.verify(); 
+    httpMock.verify();
+    sessionStorage.clear();
   });
 
   it('should be created', () => {
     expect(orderService).toBeTruthy();
+  });
+
+  it('should attach a Bearer Authorization header on order requests when a token is present', () => {
+    sessionStorage.setItem('auth_token', 'test-jwt');
+
+    orderService.listOrders().subscribe();
+
+    const req = httpMock.expectOne(baseUrlOrder);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-jwt');
+    req.flush(MockOrders);
+  });
+
+  it('should attach a Bearer Authorization header on order-item requests when a token is present', () => {
+    sessionStorage.setItem('auth_token', 'test-jwt');
+
+    orderService.listItems().subscribe();
+
+    const req = httpMock.expectOne(baseUrlOrderItem);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-jwt');
+    req.flush(MockOrderItems);
+  });
+
+  it('should not attach an Authorization header when no token is present', () => {
+    orderService.listOrders().subscribe();
+
+    const req = httpMock.expectOne(baseUrlOrder);
+    expect(req.request.headers.has('Authorization')).toBeFalse();
+    req.flush(MockOrders);
   });
 
   it('should return all Orders and return 200 status (listOrders)', () => {

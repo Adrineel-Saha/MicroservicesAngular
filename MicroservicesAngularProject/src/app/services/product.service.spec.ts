@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { ProductService } from './product.service';
 import { MockProducts } from '../mockdata/product.mock';
@@ -12,7 +13,7 @@ describe('ProductService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [ProductService]
     });
 
@@ -22,10 +23,29 @@ describe('ProductService', () => {
 
   afterEach(() => {
     httpMock.verify();
+    sessionStorage.clear();
   });
 
   it('should be created', () => {
     expect(productService).toBeTruthy();
+  });
+
+  it('should attach a Bearer Authorization header when a token is present', () => {
+    sessionStorage.setItem('auth_token', 'test-jwt');
+
+    productService.getAllProducts().subscribe();
+
+    const req = httpMock.expectOne(baseUrl);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-jwt');
+    req.flush(MockProducts);
+  });
+
+  it('should not attach an Authorization header when no token is present', () => {
+    productService.getAllProducts().subscribe();
+
+    const req = httpMock.expectOne(baseUrl);
+    expect(req.request.headers.has('Authorization')).toBeFalse();
+    req.flush(MockProducts);
   });
 
   it('should return all products and return 200 status (getAllProducts)', () => {
