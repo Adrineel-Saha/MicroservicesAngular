@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { OrderService } from './order.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { MockOrders } from '../mockdata/order.mock';
 import { MockOrderItems } from '../mockdata/order-item.mock';
 
@@ -15,7 +14,7 @@ describe('OrderService', () => {
   
   beforeEach(() => {
     TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, RouterTestingModule],
+            imports: [HttpClientTestingModule],
             providers: [OrderService]
           });
     
